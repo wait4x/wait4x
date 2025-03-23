@@ -79,5 +79,5 @@ See `custom_checker.go` for a complete example of implementing a custom checker.
 ## Additional Resources
 
 - Go Reference Documentation: https://pkg.go.dev/wait4x.dev/v3
-- GitHub Repository: https://github.com/atkrad/wait4x
-- Report Issues: https://github.com/atkrad/wait4x/issues
+- GitHub Repository: https://github.com/wait4x/wait4x
+- Report Issues: https://github.com/wait4x/wait4x/issues

@@ -3,11 +3,11 @@
   <h1>Wait4X</h1>
   <p>A lightweight tool to wait for services to be ready</p>
 
-  [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/atkrad/wait4x/ci.yaml?branch=main&style=flat-square)](https://github.com/atkrad/wait4x/actions/workflows/ci.yaml)
-  [![Coverage Status](https://img.shields.io/coverallsCoverage/github/atkrad/wait4x?branch=main&style=flat-square)](https://coveralls.io/github/atkrad/wait4x?branch=main)
+  [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/wait4x/wait4x/ci.yaml?branch=main&style=flat-square)](https://github.com/wait4x/wait4x/actions/workflows/ci.yaml)
+  [![Coverage Status](https://img.shields.io/coverallsCoverage/github/wait4x/wait4x?branch=main&style=flat-square)](https://coveralls.io/github/wait4x/wait4x?branch=main)
   [![Go Report Card](https://goreportcard.com/badge/wait4x.dev/v3?style=flat-square)](https://goreportcard.com/report/wait4x.dev/v3)
-  [![Docker Pulls](https://img.shields.io/docker/pulls/atkrad/wait4x?logo=docker&style=flat-square)](https://hub.docker.com/r/atkrad/wait4x)
-  [![GitHub Downloads](https://img.shields.io/github/downloads/atkrad/wait4x/total?logo=github&style=flat-square)](https://github.com/atkrad/wait4x/releases)
+  [![Docker Pulls](https://img.shields.io/docker/pulls/atkrad/wait4x?logo=docker&style=flat-square)](https://hub.docker.com/r/wait4x/wait4x)
+  [![GitHub Downloads](https://img.shields.io/github/downloads/wait4x/wait4x/total?logo=github&style=flat-square)](https://github.com/wait4x/wait4x/releases)
   [![Packaging status](https://img.shields.io/repology/repositories/wait4x?style=flat-square)](https://repology.org/project/wait4x/versions)
   [![Go Reference](https://img.shields.io/badge/reference-007D9C.svg?style=flat-square&logo=go&logoColor=white&labelColor=5C5C5C)](https://pkg.go.dev/wait4x.dev/v3)
 
@@ -60,42 +60,42 @@ Wait4X provides automatically updated Docker images within Docker Hub:
 
 ```bash
 # Pull the image
-docker pull atkrad/wait4x:latest
+docker pull wait4x/wait4x:latest
 
 # Run the container
-docker run --rm atkrad/wait4x:latest --help
+docker run --rm wait4x/wait4x:latest --help
 ```
 </details>
 
 <details>
 <summary><b>📦 From Binary</b></summary>
 
-Download the appropriate version for your platform from the [releases page](https://github.com/atkrad/wait4x/releases):
+Download the appropriate version for your platform from the [releases page](https://github.com/wait4x/wait4x/releases):
 
 **Linux:**
 ```bash
-curl -LO https://github.com/atkrad/wait4x/releases/latest/download/wait4x-linux-amd64.tar.gz
+curl -LO https://github.com/wait4x/wait4x/releases/latest/download/wait4x-linux-amd64.tar.gz
 tar -xf wait4x-linux-amd64.tar.gz -C /tmp
 sudo mv /tmp/wait4x-linux-amd64/wait4x /usr/local/bin/
 ```
 
 **macOS:**
 ```bash
-curl -LO https://github.com/atkrad/wait4x/releases/latest/download/wait4x-darwin-amd64.tar.gz
+curl -LO https://github.com/wait4x/wait4x/releases/latest/download/wait4x-darwin-amd64.tar.gz
 tar -xf wait4x-darwin-amd64.tar.gz -C /tmp
 sudo mv /tmp/wait4x-darwin-amd64/wait4x /usr/local/bin/
 ```
 
 **Windows:**
 ```bash
-curl -LO https://github.com/atkrad/wait4x/releases/latest/download/wait4x-windows-amd64.tar.gz
+curl -LO https://github.com/wait4x/wait4x/releases/latest/download/wait4x-windows-amd64.tar.gz
 tar -xf wait4x-windows-amd64.tar.gz
 # Move to a directory in your PATH
 ```
 
 **Verify checksums:**
 ```bash
-curl -LO https://github.com/atkrad/wait4x/releases/latest/download/wait4x-linux-amd64.tar.gz.sha256sum
+curl -LO https://github.com/wait4x/wait4x/releases/latest/download/wait4x-linux-amd64.tar.gz.sha256sum
 sha256sum --check wait4x-linux-amd64.tar.gz.sha256sum
 ```
 </details>
@@ -588,8 +588,8 @@ For more detailed examples with complete code, see the [examples/pkg](examples/p
 <summary><b>🐛 Reporting Issues</b></summary>
 
 If you encounter a bug or have a feature request, please open an issue:
-- **[Report a bug](https://github.com/atkrad/wait4x/issues/new?template=bug_report.md)**
-- **[Request a feature](https://github.com/atkrad/wait4x/issues/new?template=feature_request.md)**
+- **[Report a bug](https://github.com/wait4x/wait4x/issues/new?template=bug_report.md)**
+- **[Request a feature](https://github.com/wait4x/wait4x/issues/new?template=feature_request.md)**
 
 Please include as much information as possible, including:
 - Wait4X version
