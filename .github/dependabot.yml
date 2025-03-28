@@ -1,21 +1,46 @@
 version: 2
 updates:
+  - package-ecosystem: docker
+    directory: /
+    reviewers:
+      - "atkrad"
+    assignees:
+      - "atkrad"
+    schedule:
+      interval: "daily"
+    groups:
+      docker:
+        patterns:
+          - "*"
+
   - package-ecosystem: "gomod"
     open-pull-requests-limit: 10
     directory: "/"
     schedule:
       interval: "daily"
+    reviewers:
+      - "atkrad"
     assignees:
       - "atkrad"
     labels:
       - "dependencies"
+    groups:
+      testcontainers:
+        patterns:
+          - github.com/testcontainers/*
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    reviewers:
+      - "atkrad"
     assignees:
       - "atkrad"
     labels:
       - "actions"
       - "dependencies"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
