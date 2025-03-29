@@ -19,6 +19,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/rabbitmq"
 	"testing"
 	"time"
@@ -37,7 +38,7 @@ func (s *RabbitMQSuite) SetupSuite() {
 	s.container, err = rabbitmq.Run(
 		context.Background(),
 		"rabbitmq:3.12.11-management-alpine",
-		testcontainers.WithLogger(testcontainers.TestLogger(s.T())),
+		testcontainers.WithLogger(log.TestLogger(s.T())),
 	)
 
 	s.Require().NoError(err)

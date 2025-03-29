@@ -18,6 +18,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"testing"
 	"wait4x.dev/v3/checker"
@@ -35,7 +36,7 @@ func (s *PostgreSQLSuite) SetupSuite() {
 	s.container, err = postgres.Run(
 		context.Background(),
 		"postgres:16-alpine",
-		testcontainers.WithLogger(testcontainers.TestLogger(s.T())),
+		testcontainers.WithLogger(log.TestLogger(s.T())),
 	)
 
 	s.Require().NoError(err)

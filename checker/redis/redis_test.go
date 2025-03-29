@@ -19,6 +19,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/log"
 	redismodule "github.com/testcontainers/testcontainers-go/modules/redis"
 	"testing"
 	"time"
@@ -37,7 +38,7 @@ func (s *RedisSuite) SetupSuite() {
 	s.container, err = redismodule.Run(
 		context.Background(),
 		"redis:7",
-		testcontainers.WithLogger(testcontainers.TestLogger(s.T())),
+		testcontainers.WithLogger(log.TestLogger(s.T())),
 	)
 
 	s.Require().NoError(err)
