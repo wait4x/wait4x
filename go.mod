@@ -27,7 +27,7 @@ require (
 	github.com/tidwall/gjson v1.18.0
 	github.com/tonglil/buflogr v1.1.1
 	go.mongodb.org/mongo-driver v1.17.3
-	go.temporal.io/api v1.46.0
+	go.temporal.io/api v1.47.0
 	google.golang.org/grpc v1.71.0
 )
 
@@ -78,9 +78,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/shirou/gopsutil/v4 v4.25.1 // indirect
-	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
