@@ -13,7 +13,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.1
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/lib/pq v1.10.9
-	github.com/miekg/dns v1.1.64
+	github.com/miekg/dns v1.1.65
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
