@@ -10,7 +10,7 @@ require (
 	github.com/go-logr/stdr v1.2.2
 	github.com/go-logr/zerologr v1.2.3
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/go-sql-driver/mysql v1.9.1
+	github.com/go-sql-driver/mysql v1.9.2
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/lib/pq v1.10.9
 	github.com/miekg/dns v1.1.65
