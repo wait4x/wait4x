@@ -22,17 +22,17 @@ import (
 	"os/exec"
 	"os/signal"
 	"time"
+
+	"github.com/fatih/color"
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zerologr"
+	"github.com/rs/zerolog"
+	"github.com/spf13/cobra"
+
 	"wait4x.dev/v3/internal/cmd/dns"
 	"wait4x.dev/v3/internal/cmd/temporal"
 	"wait4x.dev/v3/internal/contextutil"
-
-	"github.com/go-logr/logr"
-	"github.com/go-logr/zerologr"
 	"wait4x.dev/v3/waiter"
-
-	"github.com/fatih/color"
-	"github.com/rs/zerolog"
-	"github.com/spf13/cobra"
 )
 
 const (
