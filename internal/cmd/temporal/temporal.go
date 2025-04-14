@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !disable_temporal
+
 package temporal
 
 import (
 	"github.com/spf13/cobra"
+
 	"wait4x.dev/v3/checker/temporal"
 )
 

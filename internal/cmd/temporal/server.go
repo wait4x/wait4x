@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !disable_temporal
+
 package temporal
 
 import (
 	"errors"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
+
 	"wait4x.dev/v3/checker/temporal"
 	"wait4x.dev/v3/internal/contextutil"
 	"wait4x.dev/v3/waiter"
