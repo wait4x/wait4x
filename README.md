@@ -6,7 +6,7 @@
   [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/wait4x/wait4x/ci.yaml?branch=main&style=flat-square)](https://github.com/wait4x/wait4x/actions/workflows/ci.yaml)
   [![Coverage Status](https://img.shields.io/coverallsCoverage/github/wait4x/wait4x?branch=main&style=flat-square)](https://coveralls.io/github/wait4x/wait4x?branch=main)
   [![Go Report Card](https://goreportcard.com/badge/wait4x.dev/v3?style=flat-square)](https://goreportcard.com/report/wait4x.dev/v3)
-  [![Docker Pulls](https://img.shields.io/docker/pulls/atkrad/wait4x?logo=docker&style=flat-square)](https://hub.docker.com/r/wait4x/wait4x)
+  [![Docker Pulls](https://img.shields.io/docker/pulls/wait4x/wait4x?logo=docker&style=flat-square)](https://hub.docker.com/r/wait4x/wait4x)
   [![GitHub Downloads](https://img.shields.io/github/downloads/wait4x/wait4x/total?logo=github&style=flat-square)](https://github.com/wait4x/wait4x/releases)
   [![Packaging status](https://img.shields.io/repology/repositories/wait4x?style=flat-square)](https://repology.org/project/wait4x/versions)
   [![Go Reference](https://img.shields.io/badge/reference-007D9C.svg?style=flat-square&logo=go&logoColor=white&labelColor=5C5C5C)](https://pkg.go.dev/wait4x.dev/v3)
