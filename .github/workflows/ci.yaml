@@ -72,6 +72,10 @@ jobs:
     name: Build
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      statuses: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
