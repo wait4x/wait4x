@@ -353,6 +353,19 @@ wait4x temporal worker localhost:7233 \
 ```
 </details>
 
+<details>
+<summary><b>📟 Shell Command</b></summary>
+
+```bash
+# Check connection.
+wait4x exec 'ping wait4x.dev -c 2'
+
+# Check file existence.
+wait4x exec 'ls target/debug/main' --exit-code 2
+```
+
+</details>
+
 ## ⚙️ Advanced Features
 
 <details>

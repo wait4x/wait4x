@@ -185,6 +185,7 @@ func Execute() {
 	rootCmd.AddCommand(NewRabbitMQCommand())
 	rootCmd.AddCommand(temporal.NewTemporalCommand())
 	rootCmd.AddCommand(NewVersionCommand())
+	rootCmd.AddCommand(NewExecCommand())
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
