@@ -168,6 +168,16 @@ Run a command after services are ready:
 wait4x tcp localhost:8080 -- echo "Service is ready!" && ./start-app.sh
 ```
 
+### Self-signed certificates
+```bash
+wait4x http https://www.wait4x.dev --cert-file /path/to/certfile --key-file /path/to/keyfile
+```
+
+### CA file
+```bash
+wait4x http https://www.wait4x.dev --ca-file /path/to/cafile`,
+```
+
 ## 📖 Detailed Usage
 
 <details>
