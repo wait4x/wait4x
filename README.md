@@ -1,57 +1,58 @@
 <div align="center">
-  <img src="logo.png" alt="Wait4X Logo" width="150">
+  <img src="logo.png" alt="Wait4X Logo" width="120">
   <h1>Wait4X</h1>
-  <p>A lightweight tool to wait for services to be ready</p>
+  <p><b>Wait4X</b> is a lightweight, zero-dependency tool to wait for services to be ready. Perfect for CI/CD, containers, and local development.</p>
 
-  [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/wait4x/wait4x/ci.yaml?branch=main&style=flat-square)](https://github.com/wait4x/wait4x/actions/workflows/ci.yaml)
-  [![Coverage Status](https://img.shields.io/coverallsCoverage/github/wait4x/wait4x?branch=main&style=flat-square)](https://coveralls.io/github/wait4x/wait4x?branch=main)
-  [![Go Report Card](https://goreportcard.com/badge/wait4x.dev/v3?style=flat-square)](https://goreportcard.com/report/wait4x.dev/v3)
-  [![Docker Pulls](https://img.shields.io/docker/pulls/wait4x/wait4x?logo=docker&style=flat-square)](https://hub.docker.com/r/wait4x/wait4x)
-  [![GitHub Downloads](https://img.shields.io/github/downloads/wait4x/wait4x/total?logo=github&style=flat-square)](https://github.com/wait4x/wait4x/releases)
-  [![Packaging status](https://img.shields.io/repology/repositories/wait4x?style=flat-square)](https://repology.org/project/wait4x/versions)
-  [![Go Reference](https://img.shields.io/badge/reference-007D9C.svg?style=flat-square&logo=go&logoColor=white&labelColor=5C5C5C)](https://pkg.go.dev/wait4x.dev/v3)
-
+  <a href="https://github.com/wait4x/wait4x/actions/workflows/ci.yaml"><img src="https://img.shields.io/github/actions/workflow/status/wait4x/wait4x/ci.yaml?branch=main&style=flat-square" alt="CI Status"></a>
+  <a href="https://coveralls.io/github/wait4x/wait4x?branch=main"><img src="https://img.shields.io/coverallsCoverage/github/wait4x/wait4x?branch=main&style=flat-square" alt="Coverage"></a>
+  <a href="https://goreportcard.com/report/wait4x.dev/v3"><img src="https://goreportcard.com/badge/wait4x.dev/v3?style=flat-square" alt="Go Report"></a>
+  <a href="https://hub.docker.com/r/wait4x/wait4x"><img src="https://img.shields.io/docker/pulls/wait4x/wait4x?logo=docker&style=flat-square" alt="Docker Pulls"></a>
+  <a href="https://github.com/wait4x/wait4x/releases"><img src="https://img.shields.io/github/downloads/wait4x/wait4x/total?logo=github&style=flat-square" alt="Downloads"></a>
+  <a href="https://repology.org/project/wait4x/versions"><img src="https://img.shields.io/repology/repositories/wait4x?style=flat-square" alt="Packaging"></a>
+  <a href="https://pkg.go.dev/wait4x.dev/v3"><img src="https://img.shields.io/badge/reference-007D9C.svg?style=flat-square&logo=go&logoColor=white&labelColor=5C5C5C" alt="Go Reference"></a>
 </div>
 
 ---
 
 ## 📑 Table of Contents
 
-- [📋 Overview](#-overview)
-- [✨ Features](#-features)
-- [📥 Installation](#-installation)
-- [🚀 Quick Start](#-quick-start)
-- [📖 Detailed Usage](#-detailed-usage)
-- [⚙️ Advanced Features](#️-advanced-features)
-- [📦 Go Package Usage](#-go-package-usage)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage Examples](#usage-examples)
+- [Advanced Features](#advanced-features)
+- [Go Package Usage](#go-package-usage)
+- [CLI Reference](#cli-reference)
+- [Contributing](#contributing)
+- [License](#license)
 
-## 📋 Overview
+---
 
-**Wait4X** is a powerful, zero-dependency tool that waits for services to be ready before continuing. It supports multiple protocols and services, making it an essential component for:
+## Overview
 
-- **CI/CD pipelines** - Ensure dependencies are available before tests run
-- **Container orchestration** - Health checking services before application startup
-- **Deployment processes** - Verify system readiness before deploying
-- **Application initialization** - Validate external service availability
-- **Local development** - Simplify localhost service readiness checks
+**Wait4X** helps you wait for services (databases, APIs, message queues, etc.) to be ready before your app or script continues. It's ideal for:
 
-## ✨ Features
+- **CI/CD pipelines**: Ensure dependencies are up before tests run
+- **Containers & orchestration**: Health check services before startup
+- **Deployments**: Verify readiness before rollout
+- **Local development**: Simplify service readiness checks
+
+## Features
 
 | Feature | Description |
 |---------|-------------|
-| **Multi-Protocol Support** | TCP, HTTP, DNS |
+| **Multi-Protocol** | TCP, HTTP, DNS, and more |
 | **Service Integrations** | Redis, MySQL, PostgreSQL, MongoDB, RabbitMQ, InfluxDB, Temporal |
-| **Reverse Checking** | Invert checks to find free ports or non-ready services |
-| **Parallel Checking** | Check multiple services simultaneously |
-| **Exponential Backoff** | Retry with increasing delays to improve reliability |
-| **CI/CD Integration** | Designed for automation workflows |
-| **Cross-Platform** | Single binary for Linux, macOS, and Windows |
-| **Go Package** | Import into your Go applications |
-| **Command Execution** | Run commands after successful checks |
+| **Reverse/Parallel Checking** | Invert checks or check multiple services at once |
+| **Exponential Backoff** | Smarter retries |
+| **Cross-Platform** | Single binary for Linux, macOS, Windows |
+| **Go Package** | Use as a Go library |
+| **Command Execution** | Run commands after checks |
 
 ## 📥 Installation
+
+*After installing, jump to [Quick Start](#quick-start) to try it out!*
 
 <details>
 <summary><b>🐳 With Docker</b></summary>
@@ -128,253 +129,234 @@ scoop install wait4x
 
 ## 🚀 Quick Start
 
-### Basic TCP Check
+Get started in seconds! After [installing](#installation), try these common checks:
 
-Wait for a port to become available:
-
+### Wait for a TCP Port
 ```bash
 wait4x tcp localhost:3306
 ```
 
 ### HTTP Health Check
-
-Wait for a web server with specific response:
-
 ```bash
-wait4x http https://example.com/health --expect-status-code 200 --expect-body-regex '"status":"UP"'
+wait4x http https://example.com/health --expect-status-code 200
 ```
 
-### Multi-Service Check (Parallel)
-
-Wait for multiple services simultaneously:
-
+### Wait for Multiple Services (Parallel)
 ```bash
 wait4x tcp 127.0.0.1:5432 127.0.0.1:6379 127.0.0.1:27017
 ```
 
 ### Database Readiness
-
-Wait for PostgreSQL to be ready:
-
 ```bash
 wait4x postgresql 'postgres://user:pass@localhost:5432/mydb?sslmode=disable'
 ```
 
-### Execute After Success
+For more, see [Usage Examples](#usage-examples) or [Detailed Usage](#detailed-usage).
 
-Run a command after services are ready:
+## Usage Examples
 
-```bash
-wait4x tcp localhost:8080 -- echo "Service is ready!" && ./start-app.sh
-```
+Here are some of the most useful Wait4X commands. Click the links for more details!
 
-### Self-signed certificates
-```bash
-wait4x http https://www.wait4x.dev --cert-file /path/to/certfile --key-file /path/to/keyfile
-```
+- **TCP:** Wait for a port to be available  
+  [`wait4x tcp localhost:8080`](#main-commands)
+- **HTTP:** Wait for a web endpoint with status code and body check  
+  [`wait4x http https://api.example.com/health --expect-status-code 200 --expect-body-regex '"status":"UP"'`](#main-commands)
+- **DNS:** Wait for DNS A record  
+  [`wait4x dns A example.com`](#main-commands)
+- **MySQL:** Wait for MySQL DB  
+  [`wait4x mysql 'user:password@tcp(localhost:3306)/mydb'`](#main-commands)
+- **Redis:** Wait for Redis and check for a key  
+  [`wait4x redis redis://localhost:6379 --expect-key "session:active"`](#main-commands)
+- **Run a command after check:**  
+  [`wait4x tcp localhost:8080 -- ./start-app.sh`](#main-commands)
+- **Reverse check (wait for port to be free):**  
+  [`wait4x tcp localhost:8080 --invert-check`](#main-commands)
+- **Parallel check:**  
+  [`wait4x tcp localhost:3306 localhost:6379 localhost:27017`](#main-commands)
 
-### CA file
-```bash
-wait4x http https://www.wait4x.dev --ca-file /path/to/cafile`,
-```
+See [Detailed Usage](#detailed-usage) for advanced options and more protocols.
 
 ## 📖 Detailed Usage
 
-<details>
-<summary><b>🌐 HTTP Checking</b></summary>
+Jump to:
+- [HTTP Checking](#http-checking)
+- [DNS Checking](#dns-checking)
+- [Database Checking](#database-checking)
+- [Message Queue Checking](#message-queue-checking)
+- [Shell Command](#shell-command)
 
-### Checking with Status Code
+---
 
-Wait for an HTTP endpoint to return a specific status code:
+### HTTP Checking
 
-```bash
-wait4x http https://api.example.com/health --expect-status-code 200
-```
+Wait for an HTTP(S) endpoint to be ready, with flexible validation options.
 
-### Checking Response Body with Regex
+- **Status code check:**
+  ```bash
+  wait4x http https://api.example.com/health --expect-status-code 200
+  ```
+- **Response body regex:**
+  ```bash
+  wait4x http https://api.example.com/status --expect-body-regex '"status":\s*"healthy"'
+  ```
+- **JSON path check:**
+  ```bash
+  wait4x http https://api.example.com/status --expect-body-json "services.database.status"
+  ```
+  Uses [GJSON Path Syntax](https://github.com/tidwall/gjson#path-syntax).
+- **XPath check:**
+  ```bash
+  wait4x http https://example.com --expect-body-xpath "//div[@id='status']"
+  ```
+- **Custom request headers:**
+  ```bash
+  wait4x http https://api.example.com \
+    --request-header "Authorization: Bearer token123" \
+    --request-header "Content-Type: application/json"
+  ```
+- **Response header check:**
+  ```bash
+  wait4x http https://api.example.com --expect-header "Content-Type=application/json"
+  ```
+- **TLS options:**
+  ```bash
+  wait4x http https://www.wait4x.dev --cert-file /path/to/certfile --key-file /path/to/keyfile
+  wait4x http https://www.wait4x.dev --ca-file /path/to/cafile
+  ```
 
-Wait for an HTTP endpoint to return a response that matches a regex pattern:
+---
 
-```bash
-wait4x http https://api.example.com/status --expect-body-regex '"status":\s*"healthy"'
-```
+### DNS Checking
 
-### Checking Response Body with JSON Path
+Check for various DNS record types and values.
 
-Wait for a specific JSON field to exist or have a specific value:
+- **A record:**
+  ```bash
+  wait4x dns A example.com
+  wait4x dns A example.com --expected-ip 93.184.216.34
+  wait4x dns A example.com --expected-ip 93.184.216.34 -n 8.8.8.8
+  ```
+- **AAAA record (IPv6):**
+  ```bash
+  wait4x dns AAAA example.com --expected-ip "2606:2800:220:1:248:1893:25c8:1946"
+  ```
+- **CNAME record:**
+  ```bash
+  wait4x dns CNAME www.example.com --expected-domain example.com
+  ```
+- **MX record:**
+  ```bash
+  wait4x dns MX example.com --expected-domain "mail.example.com"
+  ```
+- **NS record:**
+  ```bash
+  wait4x dns NS example.com --expected-nameserver "ns1.example.com"
+  ```
+- **TXT record:**
+  ```bash
+  wait4x dns TXT example.com --expected-value "v=spf1 include:_spf.example.com ~all"
+  ```
 
-```bash
-wait4x http https://api.example.com/status --expect-body-json "services.database.status"
-```
+---
 
-This uses [GJSON Path Syntax](https://github.com/tidwall/gjson#path-syntax) for powerful JSON querying.
+### Database Checking
 
-### Checking Response Body with XPath
+Check readiness for popular databases.
 
-Wait for an HTML/XML response to match an XPath query:
+#### MySQL
+- **TCP connection:**
+  ```bash
+  wait4x mysql 'user:password@tcp(localhost:3306)/mydb'
+  ```
+- **Unix socket:**
+  ```bash
+  wait4x mysql 'user:password@unix(/var/run/mysqld/mysqld.sock)/mydb'
+  ```
 
-```bash
-wait4x http https://example.com --expect-body-xpath "//div[@id='status']"
-```
+#### PostgreSQL
+- **TCP connection:**
+  ```bash
+  wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable'
+  ```
+- **Unix socket:**
+  ```bash
+  wait4x postgresql 'postgres://user:password@/mydb?host=/var/run/postgresql'
+  ```
 
-### Custom Request Headers
+#### MongoDB
+  ```bash
+  wait4x mongodb 'mongodb://user:password@localhost:27017/mydb?maxPoolSize=20'
+  ```
 
-Send specific headers with your HTTP request:
+#### Redis
+- **Basic connection:**
+  ```bash
+  wait4x redis redis://localhost:6379
+  ```
+- **With authentication and DB selection:**
+  ```bash
+  wait4x redis redis://user:password@localhost:6379/0
+  ```
+- **Check for key existence:**
+  ```bash
+  wait4x redis redis://localhost:6379 --expect-key "session:active"
+  ```
+- **Check for key with value (regex):**
+  ```bash
+  wait4x redis redis://localhost:6379 --expect-key "status=^ready$"
+  ```
 
-```bash
-wait4x http https://api.example.com \
-  --request-header "Authorization: Bearer token123" \
-  --request-header "Content-Type: application/json"
-```
+#### InfluxDB
+  ```bash
+  wait4x influxdb http://localhost:8086
+  ```
 
-### Checking Response Headers
+---
 
-Wait for a response header to match a pattern:
+### Message Queue Checking
 
-```bash
-wait4x http https://api.example.com --expect-header "Content-Type=application/json"
-```
-</details>
+#### RabbitMQ
+  ```bash
+  wait4x rabbitmq 'amqp://guest:guest@localhost:5672/myvhost'
+  ```
 
-<details>
-<summary><b>🔍 DNS Checking</b></summary>
+#### Temporal
+- **Server check:**
+  ```bash
+  wait4x temporal server localhost:7233
+  ```
+- **Worker check (namespace & task queue):**
+  ```bash
+  wait4x temporal worker localhost:7233 \
+    --namespace my-namespace \
+    --task-queue my-queue
+  ```
+- **Check for specific worker identity:**
+  ```bash
+  wait4x temporal worker localhost:7233 \
+    --namespace my-namespace \
+    --task-queue my-queue \
+    --expect-worker-identity-regex "worker-.*"
+  ```
 
-### Check A Records
+---
 
-```bash
-# Basic existence check
-wait4x dns A example.com
+### Shell Command
 
-# With expected IP
-wait4x dns A example.com --expected-ip 93.184.216.34
+Wait for a shell command to succeed or return a specific exit code.
 
-# Using specific nameserver
-wait4x dns A example.com --expected-ip 93.184.216.34 -n 8.8.8.8
-```
+- **Check connection:**
+  ```bash
+  wait4x exec 'ping wait4x.dev -c 2'
+  ```
+- **Check file existence:**
+  ```bash
+  wait4x exec 'ls target/debug/main' --exit-code 2
+  ```
 
-### Check AAAA Records (IPv6)
+---
 
-```bash
-wait4x dns AAAA example.com --expected-ip "2606:2800:220:1:248:1893:25c8:1946"
-```
-
-### Check CNAME Records
-
-```bash
-wait4x dns CNAME www.example.com --expected-domain example.com
-```
-
-### Check MX Records
-
-```bash
-wait4x dns MX example.com --expected-domain "mail.example.com"
-```
-
-### Check NS Records
-
-```bash
-wait4x dns NS example.com --expected-nameserver "ns1.example.com"
-```
-
-### Check TXT Records
-
-```bash
-wait4x dns TXT example.com --expected-value "v=spf1 include:_spf.example.com ~all"
-```
-</details>
-
-<details>
-<summary><b>💾 Database Checking</b></summary>
-
-### MySQL
-
-```bash
-# TCP connection
-wait4x mysql 'user:password@tcp(localhost:3306)/mydb'
-
-# Unix socket
-wait4x mysql 'user:password@unix(/var/run/mysqld/mysqld.sock)/mydb'
-```
-
-### PostgreSQL
-
-```bash
-# TCP connection
-wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable'
-
-# Unix socket
-wait4x postgresql 'postgres://user:password@/mydb?host=/var/run/postgresql'
-```
-
-### MongoDB
-
-```bash
-wait4x mongodb 'mongodb://user:password@localhost:27017/mydb?maxPoolSize=20'
-```
-
-### Redis
-
-```bash
-# Basic connection
-wait4x redis redis://localhost:6379
-
-# With authentication and database selection
-wait4x redis redis://user:password@localhost:6379/0
-
-# Check for key existence
-wait4x redis redis://localhost:6379 --expect-key "session:active"
-
-# Check for key with specific value (regex)
-wait4x redis redis://localhost:6379 --expect-key "status=^ready$"
-```
-
-### InfluxDB
-
-```bash
-wait4x influxdb http://localhost:8086
-```
-</details>
-
-<details>
-<summary><b>🚌 Message Queue Checking</b></summary>
-
-### RabbitMQ
-
-```bash
-wait4x rabbitmq 'amqp://guest:guest@localhost:5672/myvhost'
-```
-
-### Temporal
-
-```bash
-# Server check
-wait4x temporal server localhost:7233
-
-# Worker check (with namespace and task queue)
-wait4x temporal worker localhost:7233 \
-  --namespace my-namespace \
-  --task-queue my-queue
-
-# Check for specific worker identity
-wait4x temporal worker localhost:7233 \
-  --namespace my-namespace \
-  --task-queue my-queue \
-  --expect-worker-identity-regex "worker-.*"
-```
-</details>
-
-<details>
-<summary><b>📟 Shell Command</b></summary>
-
-```bash
-# Check connection.
-wait4x exec 'ping wait4x.dev -c 2'
-
-# Check file existence.
-wait4x exec 'ls target/debug/main' --exit-code 2
-```
-
-</details>
+See [Advanced Features](#advanced-features) for timeout, retry, backoff, and parallel/reverse checking options.
 
 ## ⚙️ Advanced Features
 
@@ -605,34 +587,78 @@ func (f *FileChecker) Check(ctx context.Context) error {
 
 For more detailed examples with complete code, see the [examples/pkg](examples/pkg) directory. Each example is in its own directory with a runnable `main.go` file.
 
+## 📝 CLI Reference
+
+Wait4X provides a flexible CLI with many commands and options. Here is a summary of the main commands and global flags. For the most up-to-date and detailed information, use the built-in help:
+
+```bash
+wait4x --help
+wait4x <command> --help
+```
+
+### Main Commands
+
+| Command         | Description                                      |
+|----------------|--------------------------------------------------|
+| `tcp`          | Wait for a TCP port to become available           |
+| `http`         | Wait for an HTTP(S) endpoint with advanced checks |
+| `dns`          | Wait for DNS records (A, AAAA, CNAME, MX, etc.)   |
+| `mysql`        | Wait for a MySQL database to be ready             |
+| `postgresql`   | Wait for a PostgreSQL database to be ready        |
+| `mongodb`      | Wait for a MongoDB database to be ready           |
+| `redis`        | Wait for a Redis server or key                    |
+| `influxdb`     | Wait for an InfluxDB server                       |
+| `rabbitmq`     | Wait for a RabbitMQ server                        |
+| `temporal`     | Wait for a Temporal server or worker              |
+| `exec`         | Wait for a shell command to succeed               |
+
+Each command supports its own set of flags. See examples above or run `wait4x <command> --help` for details.
+
+### Global Flags
+
+| Flag                                 | Description                                      |
+|--------------------------------------|--------------------------------------------------|
+| `--timeout`, `-t`                    | Set the maximum wait time (e.g., `30s`, `2m`)     |
+| `--interval`, `-i`                   | Set the interval between checks (default: 1s)     |
+| `--invert-check`                     | Invert the check (wait for NOT ready)             |
+| `--backoff-policy`                   | Retry policy: `linear` or `exponential`           |
+| `--backoff-exponential-coefficient`  | Exponential backoff multiplier (default: 2.0)     |
+| `--backoff-exponential-max-interval` | Max interval for exponential backoff              |
+| `--quiet`                            | Suppress output except errors                     |
+| `--no-color`                         | Disable colored output                            |
+
+### Getting Help
+
+For a full list of commands and options, run:
+
+```bash
+wait4x --help
+wait4x <command> --help
+```
+
 ## 🤝 Contributing
 
-<details>
-<summary><b>🐛 Reporting Issues</b></summary>
+We welcome contributions of all kinds! Whether you want to fix a bug, add a feature, improve documentation, or help others, you're in the right place.
 
-If you encounter a bug or have a feature request, please open an issue:
-- **[Report a bug](https://github.com/wait4x/wait4x/issues/new?template=bug_report.md)**
-- **[Request a feature](https://github.com/wait4x/wait4x/issues/new?template=feature_request.md)**
-
-Please include as much information as possible, including:
-- Wait4X version
-- Command-line arguments
-- Expected vs. actual behavior
-- Any error messages
-</details>
-
-<details>
-<summary><b>💻 Code Contributions</b></summary>
-
-1. Fork the repository
+**How to contribute:**
+1. [Fork the repository](https://github.com/wait4x/wait4x/fork)
 2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Make your changes
-4. Add tests for your changes
-5. Run the tests: `make test`
-6. Commit your changes: `git commit -am 'Add awesome feature'`
-7. Push the branch: `git push origin feature/your-feature-name`
-8. Create a Pull Request
-</details>
+3. Make your changes (add tests if possible)
+4. Run tests: `make test`
+5. Commit: `git commit -am 'Describe your change'`
+6. Push: `git push origin feature/your-feature-name`
+7. [Open a Pull Request](https://github.com/wait4x/wait4x/pulls)
+
+**Found a bug or have a feature request?**
+- [Report an issue](https://github.com/wait4x/wait4x/issues/new/choose)
+
+For more details, see [CONTRIBUTING.md](CONTRIBUTING.md) (if available).
+
+## 💬 Community & Support
+
+- 💡 **Questions or ideas?** Use [GitHub Discussions](https://github.com/wait4x/wait4x/discussions)
+- 🐞 **Bugs or feature requests?** [Open an issue](https://github.com/wait4x/wait4x/issues/new/choose)
+- ⭐ **Star the repo** to support the project!
 
 ## 📄 License
 
