@@ -127,6 +127,18 @@ scoop install wait4x
 [![Packaging status](https://repology.org/badge/vertical-allrepos/wait4x.svg?exclude_unsupported=1)](https://repology.org/project/wait4x/versions)
 </details>
 
+<details>
+<summary><b>🐹 Go Install (for Go users)</b></summary>
+
+You can install Wait4X directly from source using Go (requires Go 1.16+):
+
+```bash
+go install wait4x.dev/v3/cmd/wait4x@latest
+```
+
+This will place the `wait4x` binary in your `$GOPATH/bin` or `$HOME/go/bin` directory.
+</details>
+
 ## 🚀 Quick Start
 
 Get started in seconds! After [installing](#installation), try these common checks:
