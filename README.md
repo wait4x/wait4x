@@ -372,80 +372,93 @@ See [Advanced Features](#advanced-features) for timeout, retry, backoff, and par
 
 ## ⚙️ Advanced Features
 
-<details>
-<summary><b>⏱️ Timeout & Retry Control</b></summary>
+Jump to:
+- [Timeout & Retry Control](#timeout--retry-control)
+- [Exponential Backoff](#exponential-backoff)
+- [Reverse Checking](#reverse-checking)
+- [Command Execution](#command-execution)
+- [Parallel Checking](#parallel-checking)
 
-### Setting Timeout
+---
 
-Limit the total time Wait4X will wait:
+### Timeout & Retry Control
 
-```bash
-wait4x tcp localhost:8080 --timeout 30s
-```
+Control how long Wait4X waits and how often it checks.
 
-### Setting Interval
+- **Set a timeout:**
+  ```bash
+  wait4x tcp localhost:8080 --timeout 30s
+  ```
+  *Waits up to 30 seconds before giving up.*
 
-Control how frequently Wait4X retries:
+- **Set check interval:**
+  ```bash
+  wait4x tcp localhost:8080 --interval 2s
+  ```
+  *Checks every 2 seconds (default: 1s).* 
 
-```bash
-wait4x tcp localhost:8080 --interval 2s
-```
+---
 
 ### Exponential Backoff
 
-Use exponential backoff for more efficient retries:
+Retry with increasing delays for more efficient waiting (useful for slow-starting services).
 
-```bash
-wait4x http https://api.example.com \
-  --backoff-policy exponential \
-  --backoff-exponential-coefficient 2.0 \
-  --backoff-exponential-max-interval 30s
-```
-</details>
+- **Enable exponential backoff:**
+  ```bash
+  wait4x http https://api.example.com \
+    --backoff-policy exponential \
+    --backoff-exponential-coefficient 2.0 \
+    --backoff-exponential-max-interval 30s
+  ```
+  *Doubles the wait time between retries, up to 30 seconds.*
 
-<details>
-<summary><b>↔️ Reverse Checking</b></summary>
+---
 
-Wait for a port to become free:
+### Reverse Checking
 
-```bash
-wait4x tcp localhost:8080 --invert-check
-```
+Wait for a service to become unavailable (e.g., port to be free, service to stop).
 
-Wait for a service to stop:
+- **Wait for a port to become free:**
+  ```bash
+  wait4x tcp localhost:8080 --invert-check
+  ```
+- **Wait for a service to stop:**
+  ```bash
+  wait4x http https://service.local/health --expect-status-code 200 --invert-check
+  ```
+  *Use for shutdown/cleanup workflows or to ensure a port is not in use.*
 
-```bash
-wait4x http https://service.local/health --expect-status-code 200 --invert-check
-```
-</details>
+---
 
-<details>
-<summary><b>⚡ Command Execution</b></summary>
+### Command Execution
 
-Execute commands after successful wait:
+Run a command after a successful check (great for CI/CD or startup scripts).
 
-```bash
-wait4x tcp localhost:3306 -- ./deploy.sh
-```
+- **Run a script after waiting:**
+  ```bash
+  wait4x tcp localhost:3306 -- ./deploy.sh
+  ```
+- **Chain multiple commands:**
+  ```bash
+  wait4x redis redis://localhost:6379 -- echo "Redis is ready" && ./init-redis.sh
+  ```
+  *Automate your workflow after dependencies are ready.*
 
-Chain multiple commands:
+---
 
-```bash
-wait4x redis redis://localhost:6379 -- echo "Redis is ready" && ./init-redis.sh
-```
-</details>
+### Parallel Checking
 
-<details>
-<summary><b>🔄 Parallel Checking</b></summary>
+Wait for multiple services at once (all must be ready to continue).
 
-Wait for multiple services simultaneously:
+- **Check several services in parallel:**
+  ```bash
+  wait4x tcp localhost:3306 localhost:6379 localhost:27017
+  ```
+  *Use for microservices, integration tests, or complex startup dependencies.*
 
-```bash
-wait4x tcp localhost:3306 localhost:6379 localhost:27017
-```
+---
 
-Note that this waits for ALL specified services to be ready.
-</details>
+See [CLI Reference](#cli-reference) for all available flags and options.
 
 ## 📦 Go Package Usage
 
