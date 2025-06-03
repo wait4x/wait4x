@@ -40,7 +40,7 @@ RUN --mount=from=binary,target=/build \
 FROM scratch AS artifact
 COPY --from=releaser /out /
 
-FROM alpine:3.21
+FROM alpine:3.22
 RUN apk add --update --no-cache ca-certificates tzdata
 
 COPY --from=binary /wait4x /usr/bin/wait4x
