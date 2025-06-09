@@ -307,3 +307,22 @@ func TestHttpRequestBody(t *testing.T) {
 	err = hc.Check(context.TODO())
 	assert.Nil(t, err)
 }
+
+func TestHttpRequestHeaderWithoutInit(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		resp := new(bytes.Buffer)
+		for key, value := range r.Header {
+			fmt.Fprintf(resp, "%s=%s,", key, value)
+		}
+		w.Write(resp.Bytes())
+	}))
+	defer ts.Close()
+
+	hc := New(
+		ts.URL,
+		WithRequestHeader("Foo", []string{"Bar"}),
+		WithExpectBodyRegex("Foo=\\[Bar\\]"),
+	)
+	assert.Nil(t, hc.Check(context.TODO()))
+}
