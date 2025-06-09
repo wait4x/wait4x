@@ -13,6 +13,8 @@ FROM base AS build
 ARG TARGETPLATFORM
 ARG TARGETOS
 
+RUN ls -la ./
+
 RUN --mount=type=bind,target=/src,rw \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
