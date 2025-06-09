@@ -130,6 +130,9 @@ func WithRequestBody(body io.Reader) Option {
 // WithRequestHeader configures request header
 func WithRequestHeader(key string, value []string) Option {
 	return func(h *HTTP) {
+		if h.requestHeaders == nil {
+			h.requestHeaders = http.Header{}
+		}
 		h.requestHeaders[key] = value
 	}
 }
