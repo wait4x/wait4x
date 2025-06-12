@@ -351,6 +351,16 @@ Check readiness for popular databases.
     --expect-worker-identity-regex "worker-.*"
   ```
 
+#### Kafka
+  ```bash
+  wait4x kafka kafka://localhost:9090
+  ```
+
+  With auth mechanism
+  ```bash
+  wait4x kafka kafka://user:pass@127.0.0.1:9090?authMechanism=scram-sha-256
+  ```
+
 ---
 
 ### Shell Command
@@ -628,6 +638,7 @@ wait4x <command> --help
 | `tcp`          | Wait for a TCP port to become available           |
 | `http`         | Wait for an HTTP(S) endpoint with advanced checks |
 | `dns`          | Wait for DNS records (A, AAAA, CNAME, MX, etc.)   |
+| `kafka`          | Wait for Kafka server             |
 | `mysql`        | Wait for a MySQL database to be ready             |
 | `postgresql`   | Wait for a PostgreSQL database to be ready        |
 | `mongodb`      | Wait for a MongoDB database to be ready           |
