@@ -32,7 +32,7 @@ jobs:
       run: make check-gofmt
 
     - name: go-vet
-      run: go vet ./...
+      run: make check-govet
 
     - name: revive
       run: |
@@ -112,7 +112,7 @@ jobs:
         with:
           config-inline: |
             [worker.oci]
-              max-parallelism = 8
+              max-parallelism = 10
 
       - name: Login to DockerHub
         if: ${{ github.event_name != 'pull_request' }}
