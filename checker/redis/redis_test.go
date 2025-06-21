@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package redis provides the Redis checker for the Wait4X application.
 package redis
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	redismodule "github.com/testcontainers/testcontainers-go/modules/redis"
-	"testing"
-	"time"
 	"wait4x.dev/v3/checker"
 )
 

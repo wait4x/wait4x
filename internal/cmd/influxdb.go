@@ -14,6 +14,7 @@
 
 //go:build !disable_influxdb
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -29,12 +30,12 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewInfluxDBCommand creates the influxdb sub-command
+// NewInfluxDBCommand creates a new influxdb sub-command
 func NewInfluxDBCommand() *cobra.Command {
 	influxdbCommand := &cobra.Command{
 		Use:   "influxdb SERVER_URL... [flags] [-- command [args...]]",
 		Short: "Check InfluxDB connection",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("SERVER_URL is required argument for the influxdb command")
 			}

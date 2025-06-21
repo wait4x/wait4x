@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package waiter provides the Waiter for the Wait4X application.
 package waiter
 
 import (
@@ -19,6 +20,7 @@ import (
 	"time"
 )
 
+// exponentialBackoff calculates the exponential backoff duration
 func exponentialBackoff(retries int, backoffCoefficient float64, initialInterval, maxInterval time.Duration) time.Duration {
 	interval := initialInterval * time.Duration(math.Pow(backoffCoefficient, float64(retries)))
 	if interval > maxInterval {

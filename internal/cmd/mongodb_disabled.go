@@ -14,6 +14,7 @@
 
 //go:build disable_mongodb
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -22,12 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewMongoDBCommand creates the mongodb sub-command
+// NewMongoDBCommand creates a new mongodb sub-command
 func NewMongoDBCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "mongodb",
 		Short: "Check MongoDB connection - this feature is disabled",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return errors.New("MongoDB feature disabled in this build.")
 		},
 	}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main is the main package for the Custom Checker example.
 package main
 
 import (
@@ -94,6 +95,7 @@ func (f *FileChecker) Check(ctx context.Context) error {
 	return nil
 }
 
+// main is the main function for the Custom Checker example
 func main() {
 	// Create a context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

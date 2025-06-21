@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package dns provides functionality for performing DNS lookups and resolving
-// DNS records.
+// Package dns provides the DNS checker for the Wait4X application.
 package dns
 
 import (
-	"github.com/miekg/dns"
 	"net"
 	"os"
 	"time"
+
+	"github.com/miekg/dns"
 )
 
-// DefaultTimeout is the default timeout for DNS requests.
+// DefaultTimeout is the default timeout for DNS requests
 var DefaultTimeout = 5 * time.Second
+
+// defaultRR is the default DNS resolver address
 var defaultRR = "1.1.1.1:53" // Cloudflare DNS resolver
 
 // RR returns the default DNS resolver address, or the first resolver address
-// from the system's resolv.conf file if it exists and is readable.
+// from the system's resolv.conf file if it exists and is readable
 func RR(nameserver string) string {
 	if nameserver != "" {
 		return nameserver

@@ -14,6 +14,7 @@
 
 //go:build !disable_redis
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -22,19 +23,18 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
-
 	"wait4x.dev/v3/checker"
 	"wait4x.dev/v3/checker/redis"
 	"wait4x.dev/v3/internal/contextutil"
 	"wait4x.dev/v3/waiter"
 )
 
-// NewRedisCommand creates the redis sub-command
+// NewRedisCommand creates a new redis sub-command
 func NewRedisCommand() *cobra.Command {
 	redisCommand := &cobra.Command{
 		Use:   "redis ADDRESS... [flags] [-- command [args...]]",
 		Short: "Check Redis connection or key existence",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("ADDRESS is required argument for the redis command")
 			}
@@ -66,6 +66,7 @@ func NewRedisCommand() *cobra.Command {
 	return redisCommand
 }
 
+// runRedis runs the redis command
 func runRedis(cmd *cobra.Command, args []string) error {
 	conTimeout, err := cmd.Flags().GetDuration("connection-timeout")
 	if err != nil {

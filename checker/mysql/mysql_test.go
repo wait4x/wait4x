@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package mysql provides the MySQL checker for the Wait4X application.
 package mysql
 
 import (
 	"context"
+	"testing"
+
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
-	"testing"
 	"wait4x.dev/v3/checker"
 )
 

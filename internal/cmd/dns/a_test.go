@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestNewACommand tests the NewACommand function
 func TestNewACommand(t *testing.T) {
 	cmd := NewACommand()
 	assert.NotNil(t, cmd)
@@ -27,6 +28,7 @@ func TestNewACommand(t *testing.T) {
 	assert.Equal(t, []string{"a"}, cmd.Aliases)
 }
 
+// TestACommand_NoArgs tests the ACommand with no arguments
 func TestACommand_NoArgs(t *testing.T) {
 	cmd := NewACommand()
 	err := cmd.Args(cmd, []string{})
@@ -34,12 +36,14 @@ func TestACommand_NoArgs(t *testing.T) {
 	assert.Equal(t, "ADDRESS is required argument for the A command", err.Error())
 }
 
+// TestACommand_WithArgs tests the ACommand with arguments
 func TestACommand_WithArgs(t *testing.T) {
 	cmd := NewACommand()
 	err := cmd.Args(cmd, []string{"example.com"})
 	assert.NoError(t, err)
 }
 
+// TestRunA tests the ACommand with different flags and arguments
 func TestRunA(t *testing.T) {
 	tests := []struct {
 		name  string

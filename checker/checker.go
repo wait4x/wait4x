@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package checker provides the Checker interface for the Wait4X application.
 package checker
 
 import (
 	"context"
 )
 
-// Checker is the interface that wraps the basic checker methods.
+// Checker is the interface that wraps the basic checker methods
 type Checker interface {
 	Identity() (string, error)
 	Check(ctx context.Context) error

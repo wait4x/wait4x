@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 func contains(s []string, str string) bool {

@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package temporal provides the Temporal checker for the Wait4X application.
 package temporal
 
 import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"net"
+	"os"
+	"regexp"
+	"time"
+
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/taskqueue/v1"
 	"go.temporal.io/api/workflowservice/v1"
@@ -25,17 +31,13 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"net"
-	"os"
-	"regexp"
-	"time"
 	"wait4x.dev/v3/checker"
 )
 
-// Option configures a Temporal.
+// Option configures a Temporal checker
 type Option func(t *Temporal)
 
-// CheckMode specifies check mode
+// CheckMode specifies the check mode
 type CheckMode string
 
 const (
@@ -64,7 +66,7 @@ var (
 	ErrNoTaskQueue = errors.New(`no task queue provided (use temporal.WithTaskQueue("__task_queue__"))`)
 )
 
-// Temporal represents Temporal checker
+// Temporal is a Temporal checker
 type Temporal struct {
 	checkMode                 CheckMode
 	target                    string
@@ -76,7 +78,7 @@ type Temporal struct {
 	expectWorkerIdentityRegex string
 }
 
-// New creates the Temporal checker
+// New creates a new Temporal checker
 func New(checkMode CheckMode, target string, opts ...Option) checker.Checker {
 	t := &Temporal{
 		checkMode:             checkMode,
@@ -136,14 +138,14 @@ func WithExpectWorkerIdentityRegex(expectWorkerIdentityRegex string) Option {
 	}
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the Temporal checker
 func (t *Temporal) Identity() (string, error) {
 	return t.target, nil
 }
 
-// Check checks Temporal connection
+// Check checks the Temporal connection
 func (t *Temporal) Check(ctx context.Context) (err error) {
-	conn, err := t.getGRPCConn(ctx)
+	conn, err := t.getGRPCConn()
 	if err != nil {
 		return err
 	}
@@ -172,15 +174,13 @@ func (t *Temporal) Check(ctx context.Context) (err error) {
 	}
 }
 
-func (t *Temporal) getGRPCConn(ctx context.Context) (*grpc.ClientConn, error) {
+// getGRPCConn gets a GRPC connection
+func (t *Temporal) getGRPCConn() (*grpc.ClientConn, error) {
 	opts := []grpc.DialOption{
-		grpc.FailOnNonTempDialError(true),
-		grpc.WithReturnConnectionError(),
 		grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
 			d := net.Dialer{Timeout: t.timeout}
 			return d.DialContext(ctx, "tcp", addr)
 		}),
-		grpc.WithBlock(),
 	}
 
 	if t.insecureTransport {
@@ -192,10 +192,7 @@ func (t *Temporal) getGRPCConn(ctx context.Context) (*grpc.ClientConn, error) {
 		)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, t.timeout)
-	defer cancel()
-
-	conn, err := grpc.DialContext(ctx, t.target, opts...)
+	conn, err := grpc.NewClient(t.target, opts...)
 	if err != nil {
 		if os.IsTimeout(err) {
 			return nil, checker.NewExpectedError("timed out while making a grpc call", err)
@@ -209,6 +206,7 @@ func (t *Temporal) getGRPCConn(ctx context.Context) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
+// checkServer checks the Temporal server
 func (t *Temporal) checkServer(ctx context.Context, conn grpc.ClientConnInterface) error {
 	healthClient := grpc_health_v1.NewHealthClient(conn)
 	req := &grpc_health_v1.HealthCheckRequest{
@@ -231,6 +229,7 @@ func (t *Temporal) checkServer(ctx context.Context, conn grpc.ClientConnInterfac
 	return nil
 }
 
+// checkWorker checks the Temporal worker
 func (t *Temporal) checkWorker(ctx context.Context, conn grpc.ClientConnInterface) error {
 	client := workflowservice.NewWorkflowServiceClient(conn)
 	req := &workflowservice.DescribeTaskQueueRequest{

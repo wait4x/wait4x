@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -43,7 +44,7 @@ const (
 	ExitTimedOut = 124
 )
 
-// NewRootCommand creates the root command
+// NewRootCommand creates a new root command
 func NewRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "wait4x",
@@ -52,7 +53,7 @@ func NewRootCommand() *cobra.Command {
 		CompletionOptions: cobra.CompletionOptions{
 			HiddenDefaultCmd: true,
 		},
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) (err error) {
 			quiet, err := cmd.Flags().GetBool("quiet")
 			if err != nil {
 				return fmt.Errorf("unable to parse --quiet flag: %w", err)

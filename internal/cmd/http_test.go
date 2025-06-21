@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -106,7 +107,7 @@ func TestHTTPRequestHeaderSuccess(t *testing.T) {
 }
 
 func TestHTTPRequestHeaderFail(t *testing.T) {
-	hts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	hts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer hts.Close()

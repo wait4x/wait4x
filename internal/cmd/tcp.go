@@ -17,21 +17,21 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/go-logr/logr"
-	"wait4x.dev/v3/internal/contextutil"
 
+	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	"wait4x.dev/v3/checker"
 	"wait4x.dev/v3/checker/tcp"
+	"wait4x.dev/v3/internal/contextutil"
 	"wait4x.dev/v3/waiter"
 )
 
-// NewTCPCommand creates the tcp sub-command
+// NewTCPCommand creates a new tcp sub-command
 func NewTCPCommand() *cobra.Command {
 	tcpCommand := &cobra.Command{
 		Use:   "tcp ADDRESS... [flags] [-- command [args...]]",
 		Short: "Check TCP connection",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("ADDRESS is required argument for the tcp command")
 			}

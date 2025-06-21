@@ -12,27 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package dns provides the DNS command-line interface for the Wait4X application.
 package dns
 
 import (
 	"errors"
 	"fmt"
-	"wait4x.dev/v3/internal/contextutil"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
+	"wait4x.dev/v3/internal/contextutil"
+
 	dns "wait4x.dev/v3/checker/dns/a"
 	"wait4x.dev/v3/waiter"
 )
 
-// NewACommand creates the DNS A command
+// NewACommand creates a new DNS A command
 func NewACommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:     "A ADDRESS [-- command [args...]]",
 		Aliases: []string{"a"},
 		Short:   "Check DNS A records for a given domain",
 		Long:    "Check DNS A records to verify domain name resolution to IPv4 addresses. Supports checking against expected IPs and custom nameservers.",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("ADDRESS is required argument for the A command")
 			}
@@ -63,9 +65,7 @@ func NewACommand() *cobra.Command {
 	return command
 }
 
-// runA is the command handler for the "dns A" command. It checks DNS A records for the given address,
-// using the specified options such as expected IP addresses, nameserver, timeout, and interval.
-// The function returns an error if any issues occur during the DNS check.
+// runA is the command handler for the "dns A" command
 func runA(cmd *cobra.Command, args []string) error {
 	nameserver, err := cmd.Flags().GetString("nameserver")
 	if err != nil {

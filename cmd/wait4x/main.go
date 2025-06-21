@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main is the main package for the Wait4X application.
 package main
 
 import (
 	"wait4x.dev/v3/internal/cmd"
 )
 
+// main is the main function for the Wait4X application
 func main() {
 	cmd.Execute()
 }

@@ -12,33 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package http provides the HTTP checker for the Wait4X application.
 package http
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 	"wait4x.dev/v3/checker"
 )
 
+// TestMain is the main function for the HTTP checker.
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+// TestHttpInvalidAddress tests the HTTP checker with an invalid address.
 func TestHttpInvalidAddress(t *testing.T) {
 	hc := New("http://not-exists.tld", WithTimeout(time.Second))
 	assert.Error(t, hc.Check(context.TODO()))
 }
 
+// TestHttpValidAddress tests the HTTP checker with a valid address.
 func TestHttpValidAddress(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer ts.Close()
@@ -51,8 +56,9 @@ func TestHttpValidAddress(t *testing.T) {
 	assert.Equal(t, ts.URL, identity)
 }
 
+// TestHttpInvalidStatusCode tests the HTTP checker with an invalid status code.
 func TestHttpInvalidStatusCode(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer ts.Close()
@@ -63,8 +69,9 @@ func TestHttpInvalidStatusCode(t *testing.T) {
 	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
 }
 
+// TestHttpValidStatusCode tests the HTTP checker with a valid status code.
 func TestHttpValidStatusCode(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer ts.Close()
@@ -74,13 +81,15 @@ func TestHttpValidStatusCode(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpInvalidTLS tests the HTTP checker with an invalid TLS certificate.
 func TestHttpInvalidTLS(t *testing.T) {
 	hc := New("https://expired.badssl.com", WithInsecureSkipTLSVerify(true))
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpNoRedirect tests the HTTP checker with no redirect.
 func TestHttpNoRedirect(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Location", "https://wait4x.dev")
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	}))
@@ -91,8 +100,9 @@ func TestHttpNoRedirect(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpRedirect tests the HTTP checker with a redirect.
 func TestHttpRedirect(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Location", "https://wait4x.dev")
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	}))
@@ -103,8 +113,9 @@ func TestHttpRedirect(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpInvalidBody tests the HTTP checker with an invalid body.
 func TestHttpInvalidBody(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Wait4X"))
 	}))
@@ -116,8 +127,9 @@ func TestHttpInvalidBody(t *testing.T) {
 	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
 }
 
+// TestHttpValidBody tests the HTTP checker with a valid body.
 func TestHttpValidBody(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Wait4X is the best CLI tools. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla volutpat arcu malesuada lacus vulputate feugiat. Etiam vitae sem quis ligula consequat euismod. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus fringilla sapien non lacus volutpat sollicitudin. Donec sollicitudin sit amet purus ac rutrum. Nam nunc orci, luctus a sagittis."))
 	}))
@@ -128,8 +140,9 @@ func TestHttpValidBody(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpValidBodyJSON tests the HTTP checker with a valid body JSON.
 func TestHttpValidBodyJSON(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"user": {"name": "test"}, "is_active": true}`))
 	}))
@@ -145,8 +158,9 @@ func TestHttpValidBodyJSON(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpInvalidBodyJSON tests the HTTP checker with an invalid body JSON.
 func TestHttpInvalidBodyJSON(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"user": {"name": "test"}, "is_active": true}`))
 	}))
@@ -158,8 +172,9 @@ func TestHttpInvalidBodyJSON(t *testing.T) {
 	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
 }
 
+// TestHttpInvalidBodyXPath tests the HTTP checker with an invalid body XPath.
 func TestHttpInvalidBodyXPath(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("<div><code id='ip'>127.0.0.1</code></div>"))
 	}))
@@ -174,8 +189,9 @@ func TestHttpInvalidBodyXPath(t *testing.T) {
 	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
 }
 
+// TestHttpValidBodyXPath tests the HTTP checker with a valid body XPath.
 func TestHttpValidBodyXPath(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("<div><code id='ip'>127.0.0.1</code></div>"))
 	}))
@@ -188,8 +204,9 @@ func TestHttpValidBodyXPath(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpValidHeader tests the HTTP checker with a valid header.
 func TestHttpValidHeader(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Test-Header", "test-value")
 		w.Header().Add("Test-Header-New", "test-value-new")
 		w.Header().Add("Authorization", "Token 1234")
@@ -218,10 +235,11 @@ func TestHttpValidHeader(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpInvalidHeader tests the HTTP checker with an invalid header.
 func TestHttpInvalidHeader(t *testing.T) {
 	var expectedError *checker.ExpectedError
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Test-Header", "test-value")
 	}))
 	defer ts.Close()
@@ -236,6 +254,7 @@ func TestHttpInvalidHeader(t *testing.T) {
 	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
 }
 
+// TestHttpRequestHeaders tests the HTTP checker with request headers.
 func TestHttpRequestHeaders(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -256,10 +275,11 @@ func TestHttpRequestHeaders(t *testing.T) {
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 
+// TestHttpInvalidCombinationFeatures tests the HTTP checker with invalid combination features.
 func TestHttpInvalidCombinationFeatures(t *testing.T) {
 	var expectedError *checker.ExpectedError
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Test-Header", "test-value")
 		w.Write([]byte("Wait4X"))
@@ -282,6 +302,7 @@ func TestHttpInvalidCombinationFeatures(t *testing.T) {
 	assert.Equal(t, "the status code doesn't expect", err.Error())
 }
 
+// TestHttpRequestBody tests the HTTP checker with a request body.
 func TestHttpRequestBody(t *testing.T) {
 	var expectedError *checker.ExpectedError
 

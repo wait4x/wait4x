@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -27,12 +28,12 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewExecCommand creates the exec sub-command
+// NewExecCommand creates a new exec sub-command
 func NewExecCommand() *cobra.Command {
 	execCommand := &cobra.Command{
 		Use:   "exec COMMAND [ARGS...] [flags]",
 		Short: "Check command execution",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("COMMAND is required argument for the exec command")
 			}
@@ -55,6 +56,7 @@ func NewExecCommand() *cobra.Command {
 	return execCommand
 }
 
+// runExec runs the exec command
 func runExec(cmd *cobra.Command, args []string) error {
 	exitCode, _ := cmd.Flags().GetInt("exit-code")
 

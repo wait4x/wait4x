@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -48,7 +49,7 @@ type Version struct {
 	BuildTime  string
 }
 
-// NewVersionCommand creates the version sub-command
+// NewVersionCommand creates a new version sub-command
 func NewVersionCommand() *cobra.Command {
 	versionCommand := &cobra.Command{
 		Use:   "version",
@@ -60,6 +61,7 @@ func NewVersionCommand() *cobra.Command {
 	return versionCommand
 }
 
+// runVersion runs the version command
 func runVersion(_ *cobra.Command, _ []string) error {
 	versionValues := Version{
 		AppVersion: AppVersion,

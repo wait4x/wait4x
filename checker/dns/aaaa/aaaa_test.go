@@ -17,9 +17,9 @@ package aaaa
 
 import (
 	"context"
-	"github.com/stretchr/testify/suite"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	"wait4x.dev/v3/checker"
 )
 

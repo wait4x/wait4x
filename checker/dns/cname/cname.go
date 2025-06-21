@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package cname provides functionality for checking the CNAME records of a domain.
+// Package cname provides the CNAME checker for the Wait4X application.
 package cname
 
 import (
 	"context"
 	"fmt"
-	"github.com/miekg/dns"
 	"regexp"
 	"strings"
+
+	"github.com/miekg/dns"
 	"wait4x.dev/v3/checker"
 	dns2 "wait4x.dev/v3/checker/dns"
 )
@@ -28,14 +29,14 @@ import (
 // Option configures an DNS CNAME record
 type Option func(d *CNAME)
 
-// CNAME represents DNS CNAME data structure
+// CNAME is a DNS CNAME checker
 type CNAME struct {
 	nameserver      string
 	address         string
 	expectedDomains []string
 }
 
-// New creates the DNS CNAME checker
+// New creates a new DNS CNAME checker
 func New(address string, opts ...Option) checker.Checker {
 	d := &CNAME{
 		address: address,
@@ -49,26 +50,26 @@ func New(address string, opts ...Option) checker.Checker {
 	return d
 }
 
-// WithNameServer overrides the default nameserver
+// WithNameServer overrides the default nameserver for the DNS CNAME checker
 func WithNameServer(nameserver string) Option {
 	return func(d *CNAME) {
 		d.nameserver = nameserver
 	}
 }
 
-// WithExpectedDomains sets expected domains
+// WithExpectedDomains sets expected domains for the DNS CNAME checker
 func WithExpectedDomains(doamins []string) Option {
 	return func(d *CNAME) {
 		d.expectedDomains = doamins
 	}
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the DNS CNAME checker
 func (d *CNAME) Identity() (string, error) {
 	return d.address, nil
 }
 
-// Check checks DNS TXT records
+// Check checks the DNS CNAME records
 func (d *CNAME) Check(ctx context.Context) (err error) {
 	c := new(dns.Client)
 	c.Timeout = dns2.DefaultTimeout

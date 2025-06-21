@@ -2,20 +2,17 @@
   description = "Wait4X allows you to wait for a port or a service to enter the requested state.";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
-    nixpkgs-unstable,
     flake-utils,
   }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
-      unstable = nixpkgs-unstable.legacyPackages.${system};
       packageName = "wait4x";
       version = "${self.shortRev or self.dirtyShortRev or "dirty"}";
     in {
@@ -24,7 +21,10 @@
         name = packageName;
         buildInputs = with pkgs; [
           go
+          gotools
+          golint
           gopls
+          revive
           golangci-lint
           delve
           git

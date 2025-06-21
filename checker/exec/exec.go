@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package exec provides the Exec checker for the Wait4X application.
 package exec
 
 import (
@@ -23,17 +24,17 @@ import (
 	"wait4x.dev/v3/checker"
 )
 
-// Option configures an Exec.
+// Option configures an Exec checker
 type Option func(e *Exec)
 
-// Exec represents command execution checker
+// Exec is a command execution checker
 type Exec struct {
 	command        string
 	args           []string
 	expectExitCode int
 }
 
-// New creates the Exec checker
+// New creates a new Exec checker
 func New(command string, opts ...Option) checker.Checker {
 	e := &Exec{
 		command:        command,

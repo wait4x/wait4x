@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package mongodb provides a MongoDB checker.
+// Package mongodb provides the MongoDB checker for the Wait4X application.
 package mongodb
 
 import (
 	"context"
+	"testing"
+
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
-	"testing"
 	"wait4x.dev/v3/checker"
 )
 

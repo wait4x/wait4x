@@ -14,6 +14,7 @@
 
 //go:build !disable_mysql
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -29,12 +30,12 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewMysqlCommand creates the mysql sub-command
+// NewMysqlCommand creates a new mysql sub-command
 func NewMysqlCommand() *cobra.Command {
 	mysqlCommand := &cobra.Command{
 		Use:   "mysql DSN... [flags] [-- command [args...]]",
 		Short: "Check MySQL connection",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("DSN is required argument for the mysql command")
 			}

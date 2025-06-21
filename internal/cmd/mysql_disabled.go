@@ -14,6 +14,7 @@
 
 //go:build disable_mysql
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -22,12 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewMySQLCommand creates the mysql sub-command
+// NewMySQLCommand creates a new mysql sub-command
 func NewMysqlCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "mysql",
 		Short: "Check MySQL connection - this feature is disabled",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return errors.New("MySQL feature disabled in this build.")
 		},
 	}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main is the main package for the Parallel Services example.
 package main
 
 import (
@@ -28,6 +29,7 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
+// main is the main function for the Parallel Services example
 func main() {
 	// Set up a logger
 	stdr.SetVerbosity(4) // Set log level
@@ -83,6 +85,7 @@ func main() {
 	startApplication()
 }
 
+// startApplication is a helper function to start the application
 func startApplication() {
 	fmt.Println("Starting application...")
 	// Your application code here

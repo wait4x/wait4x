@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package mx provides functionality for checking the MX records of a domain.
+// Package mx provides the MX checker for the Wait4X application.
 package mx
 
 import (
 	"context"
-	"github.com/stretchr/testify/suite"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	"wait4x.dev/v3/checker"
 )
 
+// server is the server to use for the tests
 const server = "wait4x.dev"
 
-// TestSuite is a test suite for the MX checker.
+// TestSuite is a test suite for the MX checker
 type TestSuite struct {
 	suite.Suite
 }

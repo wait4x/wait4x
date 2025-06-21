@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package dns provides the DNS command-line interface for the Wait4X application.
 package dns
 
 import (
@@ -20,6 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestNewTXTCommand tests the NewTXTCommand function
 func TestNewTXTCommand(t *testing.T) {
 	cmd := NewTXTCommand()
 

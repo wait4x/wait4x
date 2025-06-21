@@ -14,6 +14,7 @@
 
 //go:build !disable_postgresql
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -29,13 +30,13 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewPostgresqlCommand creates the postgresql sub-command
+// NewPostgresqlCommand creates a new postgresql sub-command
 func NewPostgresqlCommand() *cobra.Command {
 	postgresqlCommand := &cobra.Command{
 		Use:     "postgresql DSN... [flags] [-- command [args...]]",
 		Aliases: []string{"postgres", "postgre"},
 		Short:   "Check PostgreSQL connection",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("DSN is required argument for the postgresql command")
 			}
