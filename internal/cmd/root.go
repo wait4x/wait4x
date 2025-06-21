@@ -182,6 +182,7 @@ func Execute() {
 	rootCmd.AddCommand(NewMysqlCommand())
 	rootCmd.AddCommand(NewRedisCommand())
 	rootCmd.AddCommand(NewInfluxDBCommand())
+	rootCmd.AddCommand(NewKafkaCommand())
 	rootCmd.AddCommand(NewMongoDBCommand())
 	rootCmd.AddCommand(NewRabbitMQCommand())
 	rootCmd.AddCommand(temporal.NewTemporalCommand())
