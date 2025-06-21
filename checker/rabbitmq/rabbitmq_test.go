@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package rabbitmq provides RabbitMQ checker.
+// Package rabbitmq provides the RabbitMQ checker for the Wait4X application.
 package rabbitmq
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/rabbitmq"
-	"testing"
-	"time"
 	"wait4x.dev/v3/checker"
 )
 

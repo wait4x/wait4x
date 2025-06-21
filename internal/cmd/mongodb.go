@@ -14,6 +14,7 @@
 
 //go:build !disable_mongodb
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -34,7 +35,7 @@ func NewMongoDBCommand() *cobra.Command {
 	mongodbCommand := &cobra.Command{
 		Use:   "mongodb DSN... [flags] [-- command [args...]]",
 		Short: "Check MongoDB connection",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("DSN is required argument for the mongodb command")
 			}

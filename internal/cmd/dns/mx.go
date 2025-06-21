@@ -12,27 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package dns provides the DNS command-line interface for the Wait4X application.
 package dns
 
 import (
 	"errors"
 	"fmt"
-	"wait4x.dev/v3/internal/contextutil"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	dns "wait4x.dev/v3/checker/dns/mx"
+	"wait4x.dev/v3/internal/contextutil"
 	"wait4x.dev/v3/waiter"
 )
 
-// NewMXCommand creates the DNS MX command
+// NewMXCommand creates a new DNS MX command
 func NewMXCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:     "MX ADDRESS [-- command [args...]]",
 		Aliases: []string{"mx"},
 		Short:   "Check DNS MX (mail exchanger) records for a given domain",
 		Long:    "Check for the existence and validity of DNS MX (mail exchanger) records for a specified domain. MX records specify the mail servers responsible for receiving email on behalf of the domain.",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("ADDRESS is required argument for the MX command")
 			}
@@ -62,6 +63,7 @@ func NewMXCommand() *cobra.Command {
 	return command
 }
 
+// runMX is the command handler for the "dns MX" command
 func runMX(cmd *cobra.Command, args []string) error {
 	nameserver, err := cmd.Flags().GetString("nameserver")
 	if err != nil {

@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package dns provides the DNS command-line interface for the Wait4X application.
 package dns
 
 import (
 	"errors"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	dns "wait4x.dev/v3/checker/dns/cname"
@@ -24,16 +26,14 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewCNAMECommand creates a new Cobra command for the "dns CNAME" subcommand. This command
-// checks DNS CNAME records and optionally verifies expected domain names. It supports various
-// configuration options such as timeout, interval, nameserver, and expected domains.
+// NewCNAMECommand creates a new DNS CNAME command
 func NewCNAMECommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:     "CNAME ADDRESS [-- command [args...]]",
 		Aliases: []string{"cname"},
 		Short:   "Check DNS CNAME records for a given domain",
 		Long:    "Check DNS CNAME records and optionally verify expected domain names",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("ADDRESS is required argument for the CNAME command")
 			}
@@ -60,10 +60,7 @@ func NewCNAMECommand() *cobra.Command {
 	return command
 }
 
-// runCNAME is the command handler for the "dns CNAME" command. It checks DNS CNAME records and
-// optionally verifies expected domain names. It uses the provided command flags to configure the
-// DNS check, such as timeout, interval, nameserver, and expected domains. The function returns
-// an error if the DNS check fails.
+// runCNAME is the command handler for the "dns CNAME" command
 func runCNAME(cmd *cobra.Command, args []string) error {
 	nameserver, err := cmd.Flags().GetString("nameserver")
 	if err != nil {

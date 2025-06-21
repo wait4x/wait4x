@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package dns provides the DNS command-line interface for the Wait4X application.
 package dns
 
 import (
@@ -20,6 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestNewCNAMECommand tests the NewCNAMECommand function
 func TestNewCNAMECommand(t *testing.T) {
 	cmd := NewCNAMECommand()
 
@@ -40,6 +42,7 @@ func TestNewCNAMECommand(t *testing.T) {
 	assert.Empty(t, expectDomain)
 }
 
+// TestRunCNAME tests the CNAMECommand with different flags and arguments
 func TestRunCNAME(t *testing.T) {
 	cmd := NewCNAMECommand()
 

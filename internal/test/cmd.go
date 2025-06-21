@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package test provides utilities for testing the Wait4X application.
 package test
 
 import (
@@ -20,13 +21,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ExecuteCommand executes command in testing environment.
+// ExecuteCommand executes command in testing environment
 func ExecuteCommand(root *cobra.Command, args ...string) (output string, err error) {
 	_, output, err = executeCommandC(root, args...)
 
 	return output, err
 }
 
+// executeCommandC executes command in testing environment
 func executeCommandC(root *cobra.Command, args ...string) (c *cobra.Command, output string, err error) {
 	buf := new(bytes.Buffer)
 	root.SetOut(buf)

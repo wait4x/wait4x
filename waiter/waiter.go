@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package waiter provides the Waiter for the Wait4X application.
 package waiter
 
 import (
@@ -26,7 +27,7 @@ import (
 	"wait4x.dev/v3/checker"
 )
 
-// Constants representing the available backoff policies for retry mechanisms.
+// Constants representing the available backoff policies for retry mechanisms
 const (
 	// BackoffPolicyLinear indicates a linear backoff policy,
 	BackoffPolicyLinear = "linear"
@@ -34,13 +35,13 @@ const (
 	BackoffPolicyExponential = "exponential"
 )
 
-// Check represents the checker's check method.
+// Check represents the checker's check method
 type Check func(ctx context.Context) error
 
-// Option configures an options
+// Option configures an options for the Waiter
 type Option func(s *options)
 
-// options represents waiter options
+// options represents the Waiter options
 type options struct {
 	timeout                       time.Duration
 	interval                      time.Duration

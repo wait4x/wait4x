@@ -14,6 +14,7 @@
 
 //go:build disable_influxdb
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -22,12 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewInfluxDBCommand creates the influxdb sub-command
+// NewInfluxDBCommand creates a new influxdb sub-command
 func NewInfluxDBCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "influxdb",
 		Short: "Check InfluxDB connection - this feature is disabled",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return errors.New("Influxdb feature disabled in this build.")
 		},
 	}

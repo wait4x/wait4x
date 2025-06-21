@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
 	"context"
 	"os"
 	"testing"
-	"wait4x.dev/v3/internal/test"
 
 	"github.com/stretchr/testify/assert"
+	"wait4x.dev/v3/internal/test"
 )
 
+// TestMain is the main function for the TCP command tests
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+// TestTcpCommandInvalidArgument tests the TCP command with invalid arguments
 func TestTcpCommandInvalidArgument(t *testing.T) {
 	rootCmd := NewRootCommand()
 	rootCmd.AddCommand(NewTCPCommand())
@@ -36,6 +39,7 @@ func TestTcpCommandInvalidArgument(t *testing.T) {
 	assert.Equal(t, "ADDRESS is required argument for the tcp command", err.Error())
 }
 
+// TestTcpConnectionSuccess tests the TCP connection success
 func TestTcpConnectionSuccess(t *testing.T) {
 	rootCmd := NewRootCommand()
 	rootCmd.AddCommand(NewTCPCommand())
@@ -45,6 +49,7 @@ func TestTcpConnectionSuccess(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+// TestTcpConnectionFail tests the TCP connection failure
 func TestTcpConnectionFail(t *testing.T) {
 	rootCmd := NewRootCommand()
 	rootCmd.AddCommand(NewTCPCommand())

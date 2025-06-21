@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package postgresql provides the PostgreSQL checker for the Wait4X application.
 package postgresql
 
 import (
@@ -19,15 +20,16 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"regexp"
 	"wait4x.dev/v3/checker"
+
 	// Needed for the PostgreSQL driver
 	_ "github.com/lib/pq"
-	"regexp"
 )
 
 var hidePasswordRegexp = regexp.MustCompile(`^(postgres://[^/:]+):[^:@]+@`)
 
-// PostgreSQL is a checker for PostgreSQL
+// PostgreSQL is a PostgreSQL checker
 type PostgreSQL struct {
 	dsn string
 }
@@ -41,7 +43,7 @@ func New(dsn string) checker.Checker {
 	return p
 }
 
-// Identity returns the PostgreSQL checker identity
+// Identity returns the identity of the PostgreSQL checker
 func (p *PostgreSQL) Identity() (string, error) {
 	u, err := url.Parse(p.dsn)
 	if err != nil {
@@ -51,7 +53,7 @@ func (p *PostgreSQL) Identity() (string, error) {
 	return u.Host, nil
 }
 
-// Check checks PostgreSQL connection
+// Check checks the PostgreSQL connection
 func (p *PostgreSQL) Check(ctx context.Context) (err error) {
 	db, err := sql.Open("postgres", p.dsn)
 	if err != nil {

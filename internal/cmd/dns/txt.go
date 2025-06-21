@@ -12,27 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package dns provides the DNS command-line interface for the Wait4X application.
 package dns
 
 import (
 	"errors"
 	"fmt"
-	"wait4x.dev/v3/internal/contextutil"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	dns "wait4x.dev/v3/checker/dns/txt"
+	"wait4x.dev/v3/internal/contextutil"
 	"wait4x.dev/v3/waiter"
 )
 
-// NewTXTCommand creates the DNS TXT command
+// NewTXTCommand creates a new DNS TXT command
 func NewTXTCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:     "TXT ADDRESS [-- command [args...]]",
 		Aliases: []string{"txt"},
 		Short:   "Check DNS TXT records for a given domain",
 		Long:    "Check DNS TXT records for a given domain name and verify TXT records",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("ADDRESS is required argument for the TXT command")
 			}
@@ -62,6 +63,7 @@ func NewTXTCommand() *cobra.Command {
 	return command
 }
 
+// runTXT is the command handler for the "dns TXT" command
 func runTXT(cmd *cobra.Command, args []string) error {
 	nameserver, err := cmd.Flags().GetString("nameserver")
 	if err != nil {

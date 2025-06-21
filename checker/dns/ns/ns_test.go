@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package ns provides functionality for checking the NS records of a domain.
+// Package ns provides the NS checker for the Wait4X application.
 package ns
 
 import (
 	"context"
-	"github.com/stretchr/testify/suite"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	"wait4x.dev/v3/checker"
 )
 
+// server is the server to use for the tests
 const server = "wait4x.dev"
 
-// TestSuite is a test suite for the DNS nameserver checker.
+// TestSuite is a test suite for the DNS nameserver checker
 type TestSuite struct {
 	suite.Suite
 }

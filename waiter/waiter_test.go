@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package waiter provides the Waiter for the Wait4X application.
 package waiter
 
 import (
@@ -19,19 +20,22 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/tonglil/buflogr"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/tonglil/buflogr"
 	"wait4x.dev/v3/checker"
 )
 
+// TestMain is the main function for the Waiter.
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+// TestWaitSuccessful tests the Waiter with a successful check.
 func TestWaitSuccessful(t *testing.T) {
 	mockChecker := new(checker.MockChecker)
 	mockChecker.On("Check", mock.Anything).Return(nil).
@@ -43,6 +47,7 @@ func TestWaitSuccessful(t *testing.T) {
 	mockChecker.AssertExpectations(t)
 }
 
+// TestWaitTimedOut tests the Waiter with a timed out check.
 func TestWaitTimedOut(t *testing.T) {
 	mockChecker := new(checker.MockChecker)
 	mockChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).
@@ -54,6 +59,7 @@ func TestWaitTimedOut(t *testing.T) {
 	mockChecker.AssertExpectations(t)
 }
 
+// TestWaitInvalidIdentity tests the Waiter with an invalid identity.
 func TestWaitInvalidIdentity(t *testing.T) {
 	invalidIdentityError := errors.New("invalid identity")
 
@@ -66,6 +72,7 @@ func TestWaitInvalidIdentity(t *testing.T) {
 	mockChecker.AssertExpectations(t)
 }
 
+// TestWaitLogger tests the Waiter with a logger.
 func TestWaitLogger(t *testing.T) {
 	mockChecker := new(checker.MockChecker)
 	mockChecker.On("Check", mock.Anything).
@@ -82,6 +89,7 @@ func TestWaitLogger(t *testing.T) {
 	mockChecker.AssertExpectations(t)
 }
 
+// TestWaitInvertCheck tests the Waiter with an inverted check.
 func TestWaitInvertCheck(t *testing.T) {
 	alwaysTrue := new(checker.MockChecker)
 	alwaysTrue.On("Check", mock.Anything).Return(nil).
@@ -100,6 +108,7 @@ func TestWaitInvertCheck(t *testing.T) {
 	alwaysFalse.AssertExpectations(t)
 }
 
+// TestWaitParallelSuccessful tests the Waiter with a parallel successful check.
 func TestWaitParallelSuccessful(t *testing.T) {
 	alwaysTrueFirst := new(checker.MockChecker)
 	alwaysTrueFirst.On("Check", mock.Anything).Return(nil).
@@ -115,6 +124,7 @@ func TestWaitParallelSuccessful(t *testing.T) {
 	alwaysTrueSecond.AssertExpectations(t)
 }
 
+// TestWaitParallelFail tests the Waiter with a parallel failed check.
 func TestWaitParallelFail(t *testing.T) {
 	alwaysTrueFirst := new(checker.MockChecker)
 	alwaysTrueFirst.On("Check", mock.Anything).Return(nil).

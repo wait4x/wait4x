@@ -12,24 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package a provides functionality for checking the A records of a domain.
+// Package a provides the A checker for the Wait4X application.
 package a
 
 import (
 	"context"
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 	"wait4x.dev/v3/checker"
 )
 
+// server is the server to use for the tests
 const server = "wait4x.dev"
 
-// TestSuite is a test suite for the A checker.
+// TestSuite is a test suite for the A checker
 type TestSuite struct {
 	suite.Suite
 }
 
-// TestCheckExistenceA tests that the A checker correctly checks for the existence of an A record.
+// TestCheckExistenceA tests that the A checker correctly checks for the existence of an A record
 func (s *TestSuite) TestCheckExistenceA() {
 	d := New(server)
 	s.Assert().Nil(d.Check(context.Background()))

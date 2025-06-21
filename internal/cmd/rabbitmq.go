@@ -29,12 +29,12 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewRabbitMQCommand creates the rabbitmq sub-command
+// NewRabbitMQCommand creates a new rabbitmq sub-command
 func NewRabbitMQCommand() *cobra.Command {
 	rabbitmqCommand := &cobra.Command{
 		Use:   "rabbitmq DSN... [flags] [-- command [args...]]",
 		Short: "Check RabbitMQ connection",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("DSN is required argument for the rabbitmq sub-command")
 			}

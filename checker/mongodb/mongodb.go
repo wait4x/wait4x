@@ -12,29 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package mongodb provides MongoDB checker.
+// Package mongodb provides the MongoDB checker for the Wait4X application.
 package mongodb
 
 import (
 	"context"
 	"errors"
+	"regexp"
+	"strings"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
-	"regexp"
-	"strings"
 	"wait4x.dev/v3/checker"
 )
 
 var hidePasswordRegexp = regexp.MustCompile(`^(mongodb://[^/:]+):[^:@]+@`)
 
-// MongoDB represents MongoDB checker
+// MongoDB is a MongoDB checker
 type MongoDB struct {
 	dsn string
 }
 
-// New creates the MongoDB checker
+// New creates a new MongoDB checker
 func New(dsn string) checker.Checker {
 	i := &MongoDB{
 		dsn: dsn,
@@ -43,7 +44,7 @@ func New(dsn string) checker.Checker {
 	return i
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the MongoDB checker
 func (m *MongoDB) Identity() (string, error) {
 	cops := options.Client().ApplyURI(m.dsn)
 	if len(cops.Hosts) == 0 {
@@ -53,7 +54,7 @@ func (m *MongoDB) Identity() (string, error) {
 	return strings.Join(cops.Hosts, ","), nil
 }
 
-// Check checks MongoDB connection
+// Check checks the MongoDB connection
 func (m *MongoDB) Check(ctx context.Context) (err error) {
 	// Creates a new Client and then initializes it using the Connect method.
 	c, err := mongo.Connect(ctx, options.Client().ApplyURI(m.dsn))

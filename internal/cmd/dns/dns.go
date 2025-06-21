@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package dns provides the DNS command-line interface for the Wait4X application.
 package dns
 
 import (
 	"github.com/spf13/cobra"
 )
 
-// NewDNSCommand creates the DNS command
+// NewDNSCommand creates a new DNS command
 func NewDNSCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "dns",

@@ -14,6 +14,7 @@
 
 //go:build !disable_temporal
 
+// Package temporal provides the Temporal command-line interface for the Wait4X application.
 package temporal
 
 import (
@@ -22,7 +23,7 @@ import (
 	"wait4x.dev/v3/checker/temporal"
 )
 
-// NewTemporalCommand creates the temporal sub-command
+// NewTemporalCommand creates a new temporal sub-command
 func NewTemporalCommand() *cobra.Command {
 	temporalCommand := &cobra.Command{
 		Use:   "temporal",

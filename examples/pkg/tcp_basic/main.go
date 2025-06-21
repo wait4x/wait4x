@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main is the main package for the TCP Basic example.
 package main
 
 import (
@@ -24,6 +25,7 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
+// main is the main function for the TCP Basic example
 func main() {
 	// Create a context with a 30-second timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

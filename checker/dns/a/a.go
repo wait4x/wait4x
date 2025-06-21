@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package a provides functionality for checking the A records of a domain.
+// Package a provides the A checker for the Wait4X application.
 package a
 
 import (
@@ -25,7 +25,7 @@ import (
 // Option configures an DNS A records
 type Option func(d *A)
 
-// A represents DNS A data structure
+// A is a DNS A checker
 type A struct {
 	nameserver  string
 	address     string
@@ -33,14 +33,14 @@ type A struct {
 	resolver    *net.Resolver
 }
 
-// New creates the DNS A checker
+// New creates a new DNS A checker for the given address
 func New(address string, opts ...Option) checker.Checker {
 	d := &A{
 		address:  address,
 		resolver: net.DefaultResolver,
 	}
 
-	// apply the list of options to A
+	// Apply the list of options to A
 	for _, opt := range opts {
 		opt(d)
 	}
@@ -48,7 +48,7 @@ func New(address string, opts ...Option) checker.Checker {
 	// Nameserver settings.
 	if d.nameserver != "" {
 		d.resolver = &net.Resolver{
-			Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+			Dial: func(ctx context.Context, network, _ string) (net.Conn, error) {
 				dialer := net.Dialer{}
 				return dialer.DialContext(ctx, network, d.nameserver)
 			},
@@ -58,26 +58,26 @@ func New(address string, opts ...Option) checker.Checker {
 	return d
 }
 
-// WithNameServer overrides the default nameserver
+// WithNameServer overrides the default nameserver for the DNS A checker
 func WithNameServer(nameserver string) Option {
 	return func(d *A) {
 		d.nameserver = nameserver
 	}
 }
 
-// WithExpectedIPV4s sets expected IPv4s
+// WithExpectedIPV4s sets expected IPv4s for the DNS A checker
 func WithExpectedIPV4s(ips []string) Option {
 	return func(d *A) {
 		d.expectedIPs = ips
 	}
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the DNS A checker
 func (d *A) Identity() (string, error) {
 	return d.address, nil
 }
 
-// Check checks A DNS records
+// Check checks the DNS A records
 func (d *A) Check(ctx context.Context) (err error) {
 	ips, err := d.resolver.LookupIP(ctx, "ip4", d.address)
 	if err != nil {

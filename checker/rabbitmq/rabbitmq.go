@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package rabbitmq provides RabbitMQ checker.
+// Package rabbitmq provides the RabbitMQ checker for the Wait4X application.
 package rabbitmq
 
 import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"net"
 	"regexp"
 	"time"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 	"wait4x.dev/v3/checker"
 )
 
@@ -42,14 +43,14 @@ const (
 	DefaultInsecureSkipTLSVerify = false
 )
 
-// RabbitMQ represents RabbitMQ checker
+// RabbitMQ is a RabbitMQ checker
 type RabbitMQ struct {
 	dsn                   string
 	timeout               time.Duration
 	insecureSkipTLSVerify bool
 }
 
-// New creates the RabbitMQ checker
+// New creates a new RabbitMQ checker
 func New(dsn string, opts ...Option) checker.Checker {
 	t := &RabbitMQ{
 		dsn:                   dsn,
@@ -79,7 +80,7 @@ func WithInsecureSkipTLSVerify(insecureSkipTLSVerify bool) Option {
 	}
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the RabbitMQ checker
 func (r *RabbitMQ) Identity() (string, error) {
 	u, err := amqp.ParseURI(r.dsn)
 	if err != nil {
@@ -89,7 +90,7 @@ func (r *RabbitMQ) Identity() (string, error) {
 	return fmt.Sprintf("%s:%d", u.Host, u.Port), nil
 }
 
-// Check checks RabbitMQ connection
+// Check checks the RabbitMQ connection
 func (r *RabbitMQ) Check(ctx context.Context) (err error) {
 	conn, err := amqp.DialConfig(
 		r.dsn,

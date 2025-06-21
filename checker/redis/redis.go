@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package redis provides the Redis checker for the Wait4X application.
 package redis
 
 import (
@@ -37,14 +38,14 @@ const (
 	DefaultConnectionTimeout = 3 * time.Second
 )
 
-// Redis represents Redis checker
+// Redis is a Redis checker
 type Redis struct {
 	address   string
 	expectKey string
 	timeout   time.Duration
 }
 
-// New creates the Redis checker
+// New creates a new Redis checker
 func New(address string, opts ...Option) checker.Checker {
 	r := &Redis{
 		address: address,
@@ -73,7 +74,7 @@ func WithExpectKey(key string) Option {
 	}
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the Redis checker
 func (r *Redis) Identity() (string, error) {
 	opts, err := redis.ParseURL(r.address)
 	if err != nil {
@@ -83,7 +84,7 @@ func (r *Redis) Identity() (string, error) {
 	return opts.Addr, nil
 }
 
-// Check checks Redis connection
+// Check checks the Redis connection
 func (r *Redis) Check(ctx context.Context) error {
 	opts, err := redis.ParseURL(r.address)
 	if err != nil {

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -33,12 +34,12 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewHTTPCommand creates the http sub-command
+// NewHTTPCommand creates a new http sub-command
 func NewHTTPCommand() *cobra.Command {
 	httpCommand := &cobra.Command{
 		Use:   "http ADDRESS... [flags] [-- command [args...]]",
 		Short: "Check HTTP connection",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("ADDRESS is required argument for the http command")
 			}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package http provides the HTTP checker for the Wait4X application.
 package http
 
 import (
@@ -43,7 +44,7 @@ const (
 	DefaultNoRedirect = false
 )
 
-// HTTP represents HTTP checker
+// HTTP is an HTTP checker
 type HTTP struct {
 	address               string
 	timeout               time.Duration
@@ -199,7 +200,7 @@ func (h *HTTP) Check(ctx context.Context) (err error) {
 	}
 
 	if h.noRedirect {
-		httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		httpClient.CheckRedirect = func(_ *http.Request, _ []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
 	}

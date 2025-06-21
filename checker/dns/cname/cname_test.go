@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package cname provides functionality for checking the CNAME records of a domain.
+// Package cname provides the CNAME checker for the Wait4X application.
 package cname
 
 import (
 	"context"
-	"github.com/stretchr/testify/suite"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	"wait4x.dev/v3/checker"
 )
 
+// server is the server to use for the tests
 const server = "www.company.info"
 
-// TestSuite is a test suite for CNAME DNS checks.
+// TestSuite is a test suite for CNAME DNS checks
 type TestSuite struct {
 	suite.Suite
 }

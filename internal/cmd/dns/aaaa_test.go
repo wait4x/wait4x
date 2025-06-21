@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestNewAAAACommand tests the NewAAAACommand function
 func TestNewAAAACommand(t *testing.T) {
 	cmd := NewAAAACommand()
 
@@ -40,6 +41,7 @@ func TestNewAAAACommand(t *testing.T) {
 	assert.Empty(t, expectIP)
 }
 
+// TestRunAAAA tests the AAAACommand with different flags and arguments
 func TestRunAAAA(t *testing.T) {
 	cmd := NewAAAACommand()
 

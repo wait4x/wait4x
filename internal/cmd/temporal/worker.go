@@ -14,6 +14,7 @@
 
 //go:build !disable_temporal
 
+// Package temporal provides the Temporal command-line interface for the Wait4X application.
 package temporal
 
 import (
@@ -28,12 +29,12 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
-// NewWorkerCommand creates the worker sub-command
+// NewWorkerCommand creates a new worker sub-command
 func NewWorkerCommand() *cobra.Command {
 	workerCommand := &cobra.Command{
 		Use:   "worker TARGET [flags] [-- command [args...]]",
 		Short: "Check Temporal worker registration",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("TARGET is required argument for the worker command")
 			}
@@ -59,6 +60,7 @@ func NewWorkerCommand() *cobra.Command {
 	return workerCommand
 }
 
+// runWorker runs the worker command
 func runWorker(cmd *cobra.Command, args []string) error {
 	conTimeout, err := cmd.Flags().GetDuration("connection-timeout")
 	if err != nil {

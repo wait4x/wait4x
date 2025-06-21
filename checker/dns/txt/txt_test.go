@@ -12,31 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package txt provides functionality for checking the TXT records of a domain.
+// Package txt provides the TXT checker for the Wait4X application.
 package txt
 
 import (
 	"context"
-	"github.com/stretchr/testify/suite"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	"wait4x.dev/v3/checker"
 )
 
+// server is the server to use for the tests
 const server = "wait4x.dev"
 
-// TestSuite is a test suite for the TXT record checker.
+// TestSuite is a test suite for the TXT record checker
 type TestSuite struct {
 	suite.Suite
 }
 
-// TestCheckExistenceTXT checks that the TXT record for the specified server exists.
+// TestCheckExistenceTXT checks that the TXT record for the specified server exists
 func (s *TestSuite) TestCheckExistenceTXT() {
 	d := New(server)
 	s.Assert().Nil(d.Check(context.Background()))
 }
 
-// TestCorrectTXT checks that the TXT record for the specified server has the expected value.
+// TestCorrectTXT checks that the TXT record for the specified server has the expected value
 func (s *TestSuite) TestCorrectTXT() {
 	d := New(server, WithExpectedValues([]string{"v=spf1 include:_spf.mx.cloudflare.net ~all"}))
 	s.Assert().Nil(d.Check(context.Background()))

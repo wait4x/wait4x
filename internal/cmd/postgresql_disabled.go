@@ -14,6 +14,7 @@
 
 //go:build disable_postgresql
 
+// Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
 import (
@@ -22,12 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewPostgresqlCommand creates the postgresql sub-command
+// NewPostgresqlCommand creates a new postgresql sub-command
 func NewPostgresqlCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "postgresql",
 		Short: "Check PostgreSQL connection - this feature is disabled",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return errors.New("PostgreSQL feature disabled in this build.")
 		},
 	}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package tcp provides the TCP checker for the Wait4X application.
 package tcp
 
 import (

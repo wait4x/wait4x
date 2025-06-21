@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main is the main package for the Reverse Checking example.
 package main
 
 import (
@@ -24,6 +25,7 @@ import (
 	"wait4x.dev/v3/waiter"
 )
 
+// main is the main function for the Reverse Checking example
 func main() {
 	// Create a context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
@@ -58,6 +60,7 @@ func main() {
 	startServiceOnPort(port)
 }
 
+// startServiceOnPort is a helper function to start a service on the given port
 func startServiceOnPort(port string) {
 	fmt.Printf("Starting new service on port %s...\n", port)
 	// Your code to start a service on the now-free port
