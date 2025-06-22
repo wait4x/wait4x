@@ -26,6 +26,9 @@ WAIT4X_BINARY_NAME ?= wait4x
 WAIT4X_MODULE_NAME ?= wait4x.dev/v3
 WAIT4X_MAIN_PATH ?= cmd/wait4x/main.go
 
+# Test configuration
+WAIT4X_COVERAGE_IGNORE_PACKAGES ?= ${WAIT4X_MODULE_NAME}/examples ${WAIT4X_MODULE_NAME}/cmd
+
 # Build configuration
 WAIT4X_BUILD_OUTPUT ?= ${CURDIR}/dist
 WAIT4X_BUILD_OS ?= $(shell go env GOOS)
@@ -73,6 +76,9 @@ WAIT4X_FLAGS ?=
 # Check if a command exists
 check_cmd = $(shell command -v $(1) 2> /dev/null)
 
+# Filter coverage output to exclude ignored packages
+filter_coverage = @grep $(foreach pkg,$(WAIT4X_COVERAGE_IGNORE_PACKAGES),-v -e "$(pkg)") coverage.out.tmp > coverage.out
+
 # =============================================================================
 # Targets
 # =============================================================================
@@ -90,12 +96,13 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "Environment variables:"
-	@echo "  GO_BINARY          Go binary to use (default: auto-detected)"
-	@echo "  GO_ENVIRONMENTS    Additional environment variables for Go"
-	@echo "  WAIT4X_BUILD_OUTPUT Build output directory (default: ./dist)"
-	@echo "  WAIT4X_BUILD_OS    Target OS for cross-compilation"
-	@echo "  WAIT4X_BUILD_ARCH  Target architecture for cross-compilation"
-	@echo "  WAIT4X_FLAGS       Additional flags for wait4x binary"
+	@echo "  GO_BINARY                       Go binary to use (default: $(GO_BINARY))"
+	@echo "  GO_ENVIRONMENTS                 Additional environment variables for Go (default: $(if $(GO_ENVIRONMENTS),$(GO_ENVIRONMENTS),none))"
+	@echo "  WAIT4X_BUILD_OUTPUT             Build output directory (default: ${WAIT4X_BUILD_OUTPUT})"
+	@echo "  WAIT4X_BUILD_OS                 Target OS for cross-compilation (default: $(WAIT4X_BUILD_OS))"
+	@echo "  WAIT4X_BUILD_ARCH               Target architecture for cross-compilation (default: $(WAIT4X_BUILD_ARCH))"
+	@echo "  WAIT4X_FLAGS                    Additional flags for wait4x binary (default: $(if $(WAIT4X_FLAGS),$(WAIT4X_FLAGS),none))"
+	@echo "  WAIT4X_COVERAGE_IGNORE_PACKAGES Space-separated list of packages to exclude from coverage (default: ${WAIT4X_COVERAGE_IGNORE_PACKAGES})"
 
 .PHONY: version
 version: ## Show version information
@@ -105,6 +112,13 @@ version: ## Show version information
 	@echo "Commit ref: $(WAIT4X_COMMIT_REF_SLUG)"
 	@echo "Commit hash: $(WAIT4X_COMMIT_HASH)"
 	@echo "Build time: $(WAIT4X_BUILD_TIME)"
+	@echo "Coverage ignore packages: $(WAIT4X_COVERAGE_IGNORE_PACKAGES)"
+
+.PHONY: show-coverage-config
+show-coverage-config: ## Show current coverage configuration
+	@echo "Coverage ignore packages: $(WAIT4X_COVERAGE_IGNORE_PACKAGES)"
+	@echo "To modify, set WAIT4X_COVERAGE_IGNORE_PACKAGES environment variable"
+	@echo "Example: WAIT4X_COVERAGE_IGNORE_PACKAGES='pkg1 pkg2' make test"
 
 .PHONY: clean
 clean: ## Clean build artifacts
@@ -128,13 +142,17 @@ check-deps: ## Check for outdated dependencies
 .PHONY: test
 test: ## Run tests with coverage
 	@echo "Running tests..."
-	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -covermode=atomic -coverprofile=coverage.out ./...
+	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -covermode=atomic -coverprofile=coverage.out.tmp ./...
+	@$(filter_coverage) > coverage.out
+	@rm coverage.out.tmp
 	@echo "Test coverage report generated: coverage.out"
 
 .PHONY: test-short
 test-short: ## Run tests without race detection
 	@echo "Running tests (short mode)..."
-	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -covermode=atomic -coverprofile=coverage.out ./...
+	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -covermode=atomic -coverprofile=coverage.out.tmp ./...
+	@$(filter_coverage) > coverage.out
+	@rm coverage.out.tmp
 
 .PHONY: test-coverage
 test-coverage: test ## Run tests and show coverage report
