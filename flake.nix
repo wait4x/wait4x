@@ -28,6 +28,7 @@
           golangci-lint
           delve
           git
+          gnumake
         ];
       };
       packages.default = pkgs.buildGoModule {
