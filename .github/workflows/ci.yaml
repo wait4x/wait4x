@@ -126,6 +126,9 @@ jobs:
         with:
           targets: artifact
           provenance: false
+          set: |
+            *.args.COMMIT_HASH=${{ github.sha }}
+            *.args.COMMIT_REF_SLUG=${{ github.ref_name }}
 
       - name: Move artifacts
         run: |

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.5.1
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
 
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.21 AS base
+FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=0
 
@@ -12,11 +12,13 @@ WORKDIR /src
 FROM base AS build
 ARG TARGETPLATFORM
 ARG TARGETOS
+ARG COMMIT_HASH
+ARG COMMIT_REF_SLUG
 
 RUN --mount=type=bind,target=/src,rw \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
-    GO_BINARY=xx-go WAIT4X_BUILD_OUTPUT=/usr/bin make build \
+    GO_BINARY=xx-go WAIT4X_BUILD_OUTPUT=/usr/bin WAIT4X_COMMIT_HASH=${COMMIT_HASH} WAIT4X_COMMIT_REF_SLUG=${COMMIT_REF_SLUG} make build \
     && xx-verify --static /usr/bin/wait4x*
 
 FROM scratch AS binary
