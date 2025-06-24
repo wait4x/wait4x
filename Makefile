@@ -79,6 +79,14 @@ check_cmd = $(shell command -v $(1) 2> /dev/null)
 # Filter coverage output to exclude ignored packages
 filter_coverage = @grep $(foreach pkg,$(WAIT4X_COVERAGE_IGNORE_PACKAGES),-v -e "$(pkg)") coverage.out.tmp > coverage.out
 
+# Common build function
+define build_binary
+	@mkdir -p $(WAIT4X_BUILD_OUTPUT)
+	CGO_ENABLED=$(WAIT4X_BUILD_CGO) GOOS=$(WAIT4X_BUILD_OS) GOARCH=$(WAIT4X_BUILD_ARCH) \
+	$(GO_ENVIRONMENTS) $(GO_BINARY) build -v $(1) \
+		-o $(WAIT4X_BUILD_OUTPUT)/$(2) $(WAIT4X_MAIN_PATH)
+endef
+
 # =============================================================================
 # Targets
 # =============================================================================
@@ -148,14 +156,18 @@ test: ## Run tests with coverage
 	@echo "Test coverage report generated: coverage.out"
 
 .PHONY: test-short
-test-short: ## Run tests without race detection
+test-short: ## Run tests without race detection and integration tests
 	@echo "Running tests (short mode)..."
-	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -covermode=atomic -coverprofile=coverage.out.tmp ./...
+	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -short -covermode=atomic -coverprofile=coverage.out.tmp ./...
 	@$(filter_coverage) > coverage.out
 	@rm coverage.out.tmp
 
 .PHONY: test-coverage
-test-coverage: test ## Run tests and show coverage report
+test-coverage: ## Run tests and show coverage report
+	@echo "Running tests with coverage..."
+	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -covermode=atomic -coverprofile=coverage.out.tmp ./...
+	@$(filter_coverage) > coverage.out
+	@rm coverage.out.tmp
 	@echo "Coverage report:"
 	$(GO_ENVIRONMENTS) $(GO_BINARY) tool cover -func=coverage.out
 	@echo ""
@@ -213,19 +225,13 @@ security: ## Run security checks
 .PHONY: build
 build: ## Build Wait4X binary
 	@echo "Building Wait4X..."
-	@mkdir -p $(WAIT4X_BUILD_OUTPUT)
-	CGO_ENABLED=$(WAIT4X_BUILD_CGO) GOOS=$(WAIT4X_BUILD_OS) GOARCH=$(WAIT4X_BUILD_ARCH) \
-	$(GO_ENVIRONMENTS) $(GO_BINARY) build -v $(WAIT4X_BUILD_FLAGS) \
-		-o $(WAIT4X_BUILD_OUTPUT)/$(WAIT4X_BINARY_NAME) $(WAIT4X_MAIN_PATH)
+	$(call build_binary,$(WAIT4X_BUILD_FLAGS),$(WAIT4X_BINARY_NAME))
 	@echo "✅ Binary built: $(WAIT4X_BUILD_OUTPUT)/$(WAIT4X_BINARY_NAME)"
 
 .PHONY: build-debug
 build-debug: ## Build Wait4X binary with debug information
 	@echo "Building Wait4X (debug mode)..."
-	@mkdir -p $(WAIT4X_BUILD_OUTPUT)
-	CGO_ENABLED=$(WAIT4X_BUILD_CGO) GOOS=$(WAIT4X_BUILD_OS) GOARCH=$(WAIT4X_BUILD_ARCH) \
-	$(GO_ENVIRONMENTS) $(GO_BINARY) build -v -gcflags="all=-N -l" \
-		-o $(WAIT4X_BUILD_OUTPUT)/$(WAIT4X_BINARY_NAME)-debug $(WAIT4X_MAIN_PATH)
+	$(call build_binary,-gcflags="all=-N -l",$(WAIT4X_BINARY_NAME)-debug)
 	@echo "✅ Debug binary built: $(WAIT4X_BUILD_OUTPUT)/$(WAIT4X_BINARY_NAME)-debug"
 
 .PHONY: build-cross
@@ -313,7 +319,11 @@ docs: ## Generate documentation
 	@echo "Generating documentation..."
 	@if [ -z "$(call check_cmd,godoc)" ]; then \
 		echo "⚠️  godoc not found. Install with: go install golang.org/x/tools/cmd/godoc@latest (or run 'nix develop' to install)"; \
+		exit 1; \
 	else \
+		echo "Running 'godoc -http=:6060' to start the documentation server"; \
+		echo "Open your browser to http://localhost:6060/pkg/$(WAIT4X_MODULE_NAME)/"; \
+		echo "Press Ctrl+C to stop the server"; \
 		godoc -http=:6060; \
 	fi
 
