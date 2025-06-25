@@ -352,20 +352,20 @@ Check readiness for popular databases.
   ```
 
 #### Kafka
-# Basic Kafka broker readiness check
-```bash
-wait4x kafka kafka://localhost:9092
-```
+- **Basic Kafka broker readiness check:**
+  ```bash
+  wait4x kafka kafka://localhost:9092
+  ```
 
-# Check Kafka broker with SASL/SCRAM authentication
-```bash
-wait4x kafka kafka://user:pass@localhost:9092?authMechanism=scram-sha-256
-```
+- **Check Kafka broker with SCRAM authentication:**
+  ```bash
+  wait4x kafka kafka://user:pass@localhost:9092?authMechanism=scram-sha-256
+  ```
 
-# Wait for multiple Kafka brokers (cluster) to be ready
-```bash
-wait4x kafka kafka://broker1:9092 kafka://broker2:9092 kafka://broker3:9092
-```
+- **Wait for multiple Kafka brokers (cluster) to be ready:**
+  ```bash
+  wait4x kafka kafka://broker1:9092 kafka://broker2:9092 kafka://broker3:9092
+  ```
 
 > **Notes:**
 > - The connection string format is: kafka://[user:pass@]host:port[?option=value&...]
