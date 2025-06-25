@@ -24,6 +24,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/charmbracelet/fang"
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zerologr"
@@ -191,7 +192,7 @@ func Execute() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	if err := rootCmd.ExecuteContext(ctx); err != nil {
+	if err := fang.Execute(ctx, rootCmd); err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			os.Exit(ExitTimedOut)
 		}
