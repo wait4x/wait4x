@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build !disable_mongodb
+//go:build !disable_kafka
 
 package cmd
 
@@ -31,7 +31,7 @@ import (
 
 // NewKafkaCommand creates the kafka sub-command
 func NewKafkaCommand() *cobra.Command {
-	mongodbCommand := &cobra.Command{
+	kafkaCommand := &cobra.Command{
 		Use:   "kafka DSN... [flags] [-- command [args...]]",
 		Short: "Check Kafka connection",
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -43,12 +43,12 @@ func NewKafkaCommand() *cobra.Command {
 		},
 		Example: `
   # Checking Kafka connection with credentials
-  wait4x mongodb 'kafka://user:pass@127.0.0.1:9090/?authMechanism=scram-sha-256'
+  wait4x kafka 'kafka://user:pass@127.0.0.1:9090/?authMechanism=scram-sha-256'
 `,
 		RunE: runKafka,
 	}
 
-	return mongodbCommand
+	return kafkaCommand
 }
 
 func runKafka(cmd *cobra.Command, args []string) error {

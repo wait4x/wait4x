@@ -38,7 +38,7 @@ type Kafka struct {
 	dsn string
 }
 
-// New creates the MongoDB checker
+// New creates the Kafka checker
 func New(dsn string) checker.Checker {
 	i := &Kafka{
 		dsn: dsn,
@@ -102,6 +102,10 @@ func (k *Kafka) Check(ctx context.Context) (err error) {
 		err = fmt.Errorf("unknown auth mechanism %q", authMechanism)
 	}
 
+	if err != nil {
+		return fmt.Errorf("failed to create SASL mechanism: %w", err)
+	}
+
 	dialer := &kafka.Dialer{
 		SASLMechanism: saslMechanism,
 		ClientID:      "wait4x-kafka-checker",
@@ -121,7 +125,7 @@ func (k *Kafka) Check(ctx context.Context) (err error) {
 			)
 		}
 
-		return fmt.Errorf("failed to connect to Kafka broker %s: %s", broker, err)
+		return fmt.Errorf("failed to connect to Kafka broker %s: %w", broker, err)
 	}
 
 	defer conn.Close()
@@ -137,7 +141,7 @@ func (k *Kafka) Check(ctx context.Context) (err error) {
 			)
 		}
 
-		return fmt.Errorf("failed to get Kafka broker list %s: %s", broker, err)
+		return fmt.Errorf("failed to get Kafka broker list %s: %w", broker, err)
 	}
 
 	return nil
