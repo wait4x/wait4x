@@ -367,9 +367,9 @@ wait4x kafka kafka://user:pass@localhost:9092?authMechanism=scram-sha-256
 wait4x kafka kafka://broker1:9092 kafka://broker2:9092 kafka://broker3:9092
 ```
 
-# Notes:
-# - The connection string format is: kafka://[user:pass@]host:port[?option=value&...]
-# - Supported options: authMechanism (scram-sha-256, scram-sha-512)
+> **Notes:**
+> - The connection string format is: kafka://[user:pass@]host:port[?option=value&...]
+> - Supported options: authMechanism (scram-sha-256, scram-sha-512)
 ---
 
 ### Shell Command
