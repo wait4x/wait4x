@@ -43,7 +43,7 @@
 | Feature | Description |
 |---------|-------------|
 | **Multi-Protocol** | TCP, HTTP, DNS, and more |
-| **Service Integrations** | Redis, MySQL, PostgreSQL, MongoDB, RabbitMQ, InfluxDB, Temporal |
+| **Service Integrations** | Redis, MySQL, PostgreSQL, MongoDB, Kafka, RabbitMQ, InfluxDB, Temporal |
 | **Reverse/Parallel Checking** | Invert checks or check multiple services at once |
 | **Exponential Backoff** | Smarter retries |
 | **Cross-Platform** | Single binary for Linux, macOS, Windows |
@@ -351,6 +351,25 @@ Check readiness for popular databases.
     --expect-worker-identity-regex "worker-.*"
   ```
 
+#### Kafka
+# Basic Kafka broker readiness check
+```bash
+wait4x kafka kafka://localhost:9092
+```
+
+# Check Kafka broker with SASL/SCRAM authentication
+```bash
+wait4x kafka kafka://user:pass@localhost:9092?authMechanism=scram-sha-256
+```
+
+# Wait for multiple Kafka brokers (cluster) to be ready
+```bash
+wait4x kafka kafka://broker1:9092 kafka://broker2:9092 kafka://broker3:9092
+```
+
+# Notes:
+# - The connection string format is: kafka://[user:pass@]host:port[?option=value&...]
+# - Supported options: authMechanism (scram-sha-256, scram-sha-512)
 ---
 
 ### Shell Command
@@ -623,11 +642,12 @@ wait4x <command> --help
 
 ### Main Commands
 
-| Command         | Description                                      |
-|----------------|--------------------------------------------------|
+| Command        | Description                                       |
+|----------------|---------------------------------------------------|
 | `tcp`          | Wait for a TCP port to become available           |
 | `http`         | Wait for an HTTP(S) endpoint with advanced checks |
 | `dns`          | Wait for DNS records (A, AAAA, CNAME, MX, etc.)   |
+| `kafka`        | Wait for Kafka server                             |
 | `mysql`        | Wait for a MySQL database to be ready             |
 | `postgresql`   | Wait for a PostgreSQL database to be ready        |
 | `mongodb`      | Wait for a MongoDB database to be ready           |

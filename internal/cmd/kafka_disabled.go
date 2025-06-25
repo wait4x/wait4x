@@ -12,30 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package checker
+//go:build disable_kafka
+
+package cmd
 
 import (
 	"errors"
-	"net"
-	"syscall"
+
+	"github.com/spf13/cobra"
 )
 
-// IsConnectionRefused attempts to determine if the given error was caused by a failure to establish a connection.
-func IsConnectionRefused(err error) bool {
-	for err != nil {
-		switch t := err.(type) {
-		case *net.OpError:
-			if t.Op == "dial" || t.Op == "read" {
-				return true
-			}
-		case syscall.Errno:
-			if t == syscall.ECONNREFUSED {
-				return true
-			}
-		}
-
-		err = errors.Unwrap(err)
+// NewKafkaCommand creates the kafka sub-command
+func NewKafkaCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "kafka",
+		Short: "Check Kafka connection - this feature is disabled",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return errors.New("Kafka feature disabled in this build.")
+		},
 	}
-
-	return false
 }
