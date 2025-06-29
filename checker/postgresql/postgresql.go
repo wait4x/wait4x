@@ -1,4 +1,4 @@
-// Copyright 2020 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package postgresql provides the PostgreSQL checker for the Wait4X application.
 package postgresql
 
 import (
@@ -19,17 +20,21 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
-	"wait4x.dev/v2/checker"
+	"regexp"
+	"wait4x.dev/v3/checker"
+
 	// Needed for the PostgreSQL driver
 	_ "github.com/lib/pq"
 )
 
-// PostgreSQL represents PostgreSQL checker
+var hidePasswordRegexp = regexp.MustCompile(`^(postgres://[^/:]+):[^:@]+@`)
+
+// PostgreSQL is a PostgreSQL checker
 type PostgreSQL struct {
 	dsn string
 }
 
-// New creates the PostgreSQL checker
+// New creates a new PostgreSQL checker
 func New(dsn string) checker.Checker {
 	p := &PostgreSQL{
 		dsn: dsn,
@@ -38,8 +43,8 @@ func New(dsn string) checker.Checker {
 	return p
 }
 
-// Identity returns the identity of the checker
-func (p PostgreSQL) Identity() (string, error) {
+// Identity returns the identity of the PostgreSQL checker
+func (p *PostgreSQL) Identity() (string, error) {
 	u, err := url.Parse(p.dsn)
 	if err != nil {
 		return "", fmt.Errorf("can't retrieve the checker identity: %w", err)
@@ -48,7 +53,7 @@ func (p PostgreSQL) Identity() (string, error) {
 	return u.Host, nil
 }
 
-// Check checks PostgreSQL connection
+// Check checks the PostgreSQL connection
 func (p *PostgreSQL) Check(ctx context.Context) (err error) {
 	db, err := sql.Open("postgres", p.dsn)
 	if err != nil {
@@ -66,7 +71,7 @@ func (p *PostgreSQL) Check(ctx context.Context) (err error) {
 		if checker.IsConnectionRefused(err) {
 			return checker.NewExpectedError(
 				"failed to establish a connection to the postgresql server", err,
-				"dsn", p.dsn,
+				"dsn", hidePasswordRegexp.ReplaceAllString(p.dsn, `$1:***@`),
 			)
 		}
 

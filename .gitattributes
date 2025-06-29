@@ -1,1 +1,1 @@
-internal/app/wait4x/cmd/version.go export-subst
+internal/cmd/version.go export-subst

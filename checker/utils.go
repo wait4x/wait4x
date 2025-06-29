@@ -1,4 +1,4 @@
-// Copyright 2022 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,23 +15,26 @@
 package checker
 
 import (
+	"errors"
 	"net"
-	"net/url"
 	"syscall"
 )
 
 // IsConnectionRefused attempts to determine if the given error was caused by a failure to establish a connection.
 func IsConnectionRefused(err error) bool {
-	switch t := err.(type) {
-	case *url.Error:
-		return IsConnectionRefused(t.Err)
-	case *net.OpError:
-		if t.Op == "dial" || t.Op == "read" {
-			return true
+	for err != nil {
+		switch t := err.(type) {
+		case *net.OpError:
+			if t.Op == "dial" || t.Op == "read" {
+				return true
+			}
+		case syscall.Errno:
+			if t == syscall.ECONNREFUSED {
+				return true
+			}
 		}
-		return IsConnectionRefused(t.Err)
-	case syscall.Errno:
-		return t == syscall.ECONNREFUSED
+
+		err = errors.Unwrap(err)
 	}
 
 	return false

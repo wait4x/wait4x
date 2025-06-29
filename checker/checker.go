@@ -1,4 +1,4 @@
-// Copyright 2020 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package checker provides the Checker interface for the Wait4X application.
 package checker
 
 import (
 	"context"
 )
 
-// Checker is the interface that wraps the basic checker methods.
+// Checker is the interface that wraps the basic checker methods
 type Checker interface {
 	Identity() (string, error)
 	Check(ctx context.Context) error

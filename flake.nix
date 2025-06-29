@@ -1,27 +1,44 @@
 {
-  description = "Wait for a port or a service to enter the requested state.";
+  description = "Wait4X allows you to wait for a port or a service to enter the requested state.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }@inputs: flake-utils.lib.eachDefaultSystem (system: {
-    packages = let
-      inherit (nixpkgs) lib;
-      inherit (nixpkgs.legacyPackages.${system}) buildGoModule;
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+  }:
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+      packageName = "wait4x";
+      version = "${self.shortRev or self.dirtyShortRev or "dirty"}";
     in {
-      default = buildGoModule {
-        pname = "wait4x";
-        version = builtins.substring 0 8 self.lastModifiedDate;
-
-        src = self;
-        # don't know why but nix is unhappy about vendorHash = null
-        vendorHash = "sha256-Jp2IUvkcqLcJk0a5A79SQTjqAkmIEVc9Ove3rMkkWuI=";
-
-        # Nix doesn't allow network access during tests, so belive in the existing tests
-        doCheck = false;
+      formatter = pkgs.alejandra;
+      devShells.default = pkgs.mkShell {
+        name = packageName;
+        buildInputs = with pkgs; [
+          go
+          gotools
+          golint
+          gopls
+          revive
+          golangci-lint
+          delve
+          git
+          gnumake
+        ];
       };
-    };
-  });
+      packages.default = pkgs.buildGoModule {
+        pname = packageName;
+        inherit version;
+        src = self;
+        vendorHash = "sha256-ODcHrmmHHeZbi1HVDkYPCyHs7mcs2UGdBzicP1+eOSI=";
+        doCheck = false;
+        nativeBuildInputs = with pkgs; [ git ];
+        GOCACHE = "$(mktemp -d)";
+      };
+    });
 }

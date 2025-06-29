@@ -1,4 +1,4 @@
-// Copyright 2020 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package tcp provides the TCP checker for the Wait4X application.
 package tcp
 
 import (
@@ -19,10 +20,11 @@ import (
 	"net"
 	"os"
 	"time"
-	"wait4x.dev/v2/checker"
+
+	"wait4x.dev/v3/checker"
 )
 
-// Option configures a TCP.
+// Option configures a TCP checker
 type Option func(t *TCP)
 
 const (
@@ -30,20 +32,20 @@ const (
 	DefaultConnectionTimeout = 3 * time.Second
 )
 
-// TCP represents TCP checker
+// TCP is a TCP checker
 type TCP struct {
 	address string
 	timeout time.Duration
 }
 
-// New creates the TCP checker
+// New creates a new TCP checker
 func New(address string, opts ...Option) checker.Checker {
 	t := &TCP{
 		address: address,
 		timeout: DefaultConnectionTimeout,
 	}
 
-	// apply the list of options to TCP
+	// Apply the list of options to TCP
 	for _, opt := range opts {
 		opt(t)
 	}
@@ -58,12 +60,12 @@ func WithTimeout(timeout time.Duration) Option {
 	}
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the TCP checker
 func (t *TCP) Identity() (string, error) {
 	return t.address, nil
 }
 
-// Check checks TCP connection
+// Check checks the TCP connection
 func (t *TCP) Check(ctx context.Context) error {
 	d := net.Dialer{Timeout: t.timeout}
 

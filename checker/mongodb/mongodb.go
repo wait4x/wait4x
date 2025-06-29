@@ -1,4 +1,4 @@
-// Copyright 2022 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package mongodb provides the MongoDB checker for the Wait4X application.
 package mongodb
 
 import (
 	"context"
 	"errors"
+	"regexp"
+	"strings"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"strings"
-	"wait4x.dev/v2/checker"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
+	"wait4x.dev/v3/checker"
 )
 
-// MongoDB represents MongoDB checker
+var hidePasswordRegexp = regexp.MustCompile(`^(mongodb://[^/:]+):[^:@]+@`)
+
+// MongoDB is a MongoDB checker
 type MongoDB struct {
 	dsn string
 }
 
-// New creates the MongoDB checker
+// New creates a new MongoDB checker
 func New(dsn string) checker.Checker {
 	i := &MongoDB{
 		dsn: dsn,
@@ -38,7 +44,7 @@ func New(dsn string) checker.Checker {
 	return i
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the MongoDB checker
 func (m *MongoDB) Identity() (string, error) {
 	cops := options.Client().ApplyURI(m.dsn)
 	if len(cops.Hosts) == 0 {
@@ -48,7 +54,7 @@ func (m *MongoDB) Identity() (string, error) {
 	return strings.Join(cops.Hosts, ","), nil
 }
 
-// Check checks MongoDB connection
+// Check checks the MongoDB connection
 func (m *MongoDB) Check(ctx context.Context) (err error) {
 	// Creates a new Client and then initializes it using the Connect method.
 	c, err := mongo.Connect(ctx, options.Client().ApplyURI(m.dsn))
@@ -65,6 +71,13 @@ func (m *MongoDB) Check(ctx context.Context) (err error) {
 	// Ping the primary
 	err = c.Ping(ctx, readpref.Primary())
 	if err != nil {
+		if checker.IsConnectionRefused(err) || errors.Is(err, topology.ErrServerSelectionTimeout) {
+			return checker.NewExpectedError(
+				"failed to establish a connection to the MongoDB server", err,
+				"dsn", hidePasswordRegexp.ReplaceAllString(m.dsn, `$1:***@`),
+			)
+		}
+
 		return err
 	}
 

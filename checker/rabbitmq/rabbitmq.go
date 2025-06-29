@@ -1,4 +1,4 @@
-// Copyright 2022 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package rabbitmq provides the RabbitMQ checker for the Wait4X application.
 package rabbitmq
 
 import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/streadway/amqp"
 	"net"
+	"regexp"
 	"time"
-	"wait4x.dev/v2/checker"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+	"wait4x.dev/v3/checker"
 )
+
+var hidePasswordRegexp = regexp.MustCompile(`(amqp://[^/:]+):[^:@]+@`)
 
 // Option configures a RabbitMQ.
 type Option func(r *RabbitMQ)
@@ -32,20 +37,20 @@ const (
 	DefaultHeartbeat = 10 * time.Second
 	// DefaultConnectionTimeout is the default connection timeout duration
 	DefaultConnectionTimeout = 3 * time.Second
-	// DefaultLocale is the default connection locale
+	// DefaultLocale is the default locale
 	DefaultLocale = "en_US"
-	// DefaultInsecureSkipTLSVerify is the default insecure skip tls verify
+	// DefaultInsecureSkipTLSVerify is the default value for whether to skip tls verify
 	DefaultInsecureSkipTLSVerify = false
 )
 
-// RabbitMQ represents RabbitMQ checker
+// RabbitMQ is a RabbitMQ checker
 type RabbitMQ struct {
 	dsn                   string
 	timeout               time.Duration
 	insecureSkipTLSVerify bool
 }
 
-// New creates the RabbitMQ checker
+// New creates a new RabbitMQ checker
 func New(dsn string, opts ...Option) checker.Checker {
 	t := &RabbitMQ{
 		dsn:                   dsn,
@@ -53,7 +58,7 @@ func New(dsn string, opts ...Option) checker.Checker {
 		insecureSkipTLSVerify: DefaultInsecureSkipTLSVerify,
 	}
 
-	// apply the list of options to RabbitMQ
+	// Apply options to RabbitMQ checker
 	for _, opt := range opts {
 		opt(t)
 	}
@@ -61,22 +66,22 @@ func New(dsn string, opts ...Option) checker.Checker {
 	return t
 }
 
-// WithTimeout configures a timeout for maximum amount of time a dial will wait for a connection to complete
+// WithTimeout configures a timeout for establishing new connections
 func WithTimeout(timeout time.Duration) Option {
 	return func(r *RabbitMQ) {
 		r.timeout = timeout
 	}
 }
 
-// WithInsecureSkipTLSVerify controls whether a client verifies the server's certificate chain and hostname
+// WithInsecureSkipTLSVerify configures whether to skip tls verify
 func WithInsecureSkipTLSVerify(insecureSkipTLSVerify bool) Option {
 	return func(r *RabbitMQ) {
 		r.insecureSkipTLSVerify = insecureSkipTLSVerify
 	}
 }
 
-// Identity returns the identity of the checker
-func (r RabbitMQ) Identity() (string, error) {
+// Identity returns the identity of the RabbitMQ checker
+func (r *RabbitMQ) Identity() (string, error) {
 	u, err := amqp.ParseURI(r.dsn)
 	if err != nil {
 		return "", fmt.Errorf("can't retrieve the checker identity: %w", err)
@@ -85,7 +90,7 @@ func (r RabbitMQ) Identity() (string, error) {
 	return fmt.Sprintf("%s:%d", u.Host, u.Port), nil
 }
 
-// Check checks RabbitMQ connection
+// Check checks the RabbitMQ connection
 func (r *RabbitMQ) Check(ctx context.Context) (err error) {
 	conn, err := amqp.DialConfig(
 		r.dsn,
@@ -118,7 +123,7 @@ func (r *RabbitMQ) Check(ctx context.Context) (err error) {
 		if checker.IsConnectionRefused(err) {
 			return checker.NewExpectedError(
 				"failed to establish a connection to the rabbitmq server", err,
-				"dsn", r.dsn,
+				"dsn", hidePasswordRegexp.ReplaceAllString(r.dsn, `$1:***@`),
 			)
 		}
 
@@ -131,6 +136,7 @@ func (r *RabbitMQ) Check(ctx context.Context) (err error) {
 		}
 	}(conn)
 
+	// Open a channel to check the connection.
 	_, err = conn.Channel()
 	if err != nil {
 		return err

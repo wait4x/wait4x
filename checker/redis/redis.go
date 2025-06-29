@@ -1,4 +1,4 @@
-// Copyright 2020 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package redis provides the Redis checker for the Wait4X application.
 package redis
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/go-redis/redis/v7"
 	"regexp"
 	"strings"
 	"time"
-	"wait4x.dev/v2/checker"
+
+	"github.com/go-redis/redis/v8"
+
+	"wait4x.dev/v3/checker"
 )
+
+var hidePasswordRegexp = regexp.MustCompile(`([^/]+//[^/:]+):[^:@]+@`)
 
 // Option configures a Redis.
 type Option func(r *Redis)
@@ -32,14 +38,14 @@ const (
 	DefaultConnectionTimeout = 3 * time.Second
 )
 
-// Redis represents Redis checker
+// Redis is a Redis checker
 type Redis struct {
 	address   string
 	expectKey string
 	timeout   time.Duration
 }
 
-// New creates the Redis checker
+// New creates a new Redis checker
 func New(address string, opts ...Option) checker.Checker {
 	r := &Redis{
 		address: address,
@@ -68,7 +74,7 @@ func WithExpectKey(key string) Option {
 	}
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the Redis checker
 func (r *Redis) Identity() (string, error) {
 	opts, err := redis.ParseURL(r.address)
 	if err != nil {
@@ -78,7 +84,7 @@ func (r *Redis) Identity() (string, error) {
 	return opts.Addr, nil
 }
 
-// Check checks Redis connection
+// Check checks the Redis connection
 func (r *Redis) Check(ctx context.Context) error {
 	opts, err := redis.ParseURL(r.address)
 	if err != nil {
@@ -89,12 +95,12 @@ func (r *Redis) Check(ctx context.Context) error {
 	client := redis.NewClient(opts)
 
 	// Check Redis connection
-	_, err = client.WithContext(ctx).Ping().Result()
+	_, err = client.Ping(ctx).Result()
 	if err != nil {
 		if checker.IsConnectionRefused(err) {
 			return checker.NewExpectedError(
 				"failed to establish a connection to the redis server", err,
-				"dsn", r.address,
+				"dsn", hidePasswordRegexp.ReplaceAllString(r.address, `$1:***@`),
 			)
 		}
 
@@ -109,13 +115,13 @@ func (r *Redis) Check(ctx context.Context) error {
 	splittedKey := strings.Split(r.expectKey, "=")
 	keyHasValue := len(splittedKey) == 2
 
-	val, err := client.WithContext(ctx).Get(splittedKey[0]).Result()
-	if err == redis.Nil {
-		// Redis key does not exist.
-		return checker.NewExpectedError("the key doesn't exist", nil, "key", splittedKey[0])
-	}
-
+	val, err := client.Get(ctx, splittedKey[0]).Result()
 	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			// Redis key does not exist.
+			return checker.NewExpectedError("the key doesn't exist", nil, "key", splittedKey[0])
+		}
+
 		// Error occurred on get Redis key
 		return err
 	}

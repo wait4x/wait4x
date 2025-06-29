@@ -2,3 +2,6 @@ bin
 dist
 vendor
 coverage.out
+
+# Nix build results
+result

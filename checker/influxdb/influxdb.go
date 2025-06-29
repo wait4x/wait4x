@@ -1,4 +1,4 @@
-// Copyright 2022 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package influxdb provides the InfluxDB checker for the Wait4X application.
 package influxdb
 
 import (
 	"context"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"wait4x.dev/v2/checker"
+	"wait4x.dev/v3/checker"
 )
 
-// InfluxDB represents InfluxDB checker
+// InfluxDB is an InfluxDB checker
 type InfluxDB struct {
 	serverURL string
 }
 
-// New creates the InfluxDB checker
+// New creates a new InfluxDB checker
 func New(serverURL string) checker.Checker {
 	i := &InfluxDB{
 		serverURL: serverURL,
@@ -34,19 +35,19 @@ func New(serverURL string) checker.Checker {
 	return i
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the InfluxDB checker
 func (i *InfluxDB) Identity() (string, error) {
 	return i.serverURL, nil
 }
 
-// Check checks InfluxDB connection
+// Check checks the InfluxDB connection
 func (i *InfluxDB) Check(ctx context.Context) error {
 	// InfluxDB doesn't validate authentication params on Ping and Health requests.
 	ic := influxdb2.NewClient(i.serverURL, "")
 	defer ic.Close()
 
 	res, err := ic.Ping(ctx)
-	if res == false {
+	if !res {
 		if checker.IsConnectionRefused(err) {
 			return checker.NewExpectedError(
 				"failed to establish a connection to the influxdb server", err,

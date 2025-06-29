@@ -1,4 +1,4 @@
-// Copyright 2021 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package waiter provides the Waiter for the Wait4X application.
 package waiter
 
 import (
@@ -23,10 +24,10 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"wait4x.dev/v2/checker"
+	"wait4x.dev/v3/checker"
 )
 
-// Constants representing the available backoff policies for retry mechanisms.
+// Constants representing the available backoff policies for retry mechanisms
 const (
 	// BackoffPolicyLinear indicates a linear backoff policy,
 	BackoffPolicyLinear = "linear"
@@ -34,13 +35,13 @@ const (
 	BackoffPolicyExponential = "exponential"
 )
 
-// Check represents the checker's check method.
+// Check represents the checker's check method
 type Check func(ctx context.Context) error
 
-// Option configures an options
+// Option configures an options for the Waiter
 type Option func(s *options)
 
-// options represents waiter options
+// options represents the Waiter options
 type options struct {
 	timeout                       time.Duration
 	interval                      time.Duration
@@ -147,12 +148,6 @@ func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts .
 // Wait waits for end up of check execution.
 func Wait(checker checker.Checker, opts ...Option) error {
 	return WaitContext(context.Background(), checker, opts...)
-}
-
-// WaitWithContext waits for end up of check execution.
-// Deprecated: The function will be removed in v3.0.0, please use the WaitContext.
-func WaitWithContext(ctx context.Context, checker checker.Checker, opts ...Option) error {
-	return WaitContext(ctx, checker, opts...)
 }
 
 // WaitContext waits for end up of check execution.

@@ -1,4 +1,4 @@
-// Copyright 2020 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package mysql provides the MySQL checker for the Wait4X application.
 package mysql
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+	"regexp"
+
 	"github.com/go-sql-driver/mysql"
-	"wait4x.dev/v2/checker"
-	// Needed for the MySQL driver
-	_ "github.com/go-sql-driver/mysql"
+	"wait4x.dev/v3/checker"
 )
 
-// MySQL represents MySQL checker
+var hidePasswordRegexp = regexp.MustCompile(`^([^:]+):[^:@]+@`)
+
+// MySQL is a MySQL checker
 type MySQL struct {
 	dsn string
 }
 
-// New creates the MySQL checker
+// New creates a new MySQL checker
 func New(dsn string) checker.Checker {
 	m := &MySQL{
 		dsn: dsn,
@@ -38,7 +41,7 @@ func New(dsn string) checker.Checker {
 	return m
 }
 
-// Identity returns the identity of the checker
+// Identity returns the identity of the MySQL checker
 func (m *MySQL) Identity() (string, error) {
 	cfg, err := mysql.ParseDSN(m.dsn)
 	if err != nil {
@@ -48,7 +51,7 @@ func (m *MySQL) Identity() (string, error) {
 	return cfg.Addr, nil
 }
 
-// Check checks MySQL connection
+// Check checks the MySQL connection
 func (m *MySQL) Check(ctx context.Context) (err error) {
 	db, err := sql.Open("mysql", m.dsn)
 	if err != nil {
@@ -66,7 +69,7 @@ func (m *MySQL) Check(ctx context.Context) (err error) {
 		if checker.IsConnectionRefused(err) {
 			return checker.NewExpectedError(
 				"failed to establish a connection to the mysql server", err,
-				"dsn", m.dsn,
+				"dsn", hidePasswordRegexp.ReplaceAllString(m.dsn, `$1:***@`),
 			)
 		}
 

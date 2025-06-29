@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.5.1
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.2.0 AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
 
-FROM --platform=$BUILDPLATFORM golang:1.18.10-alpine3.17 AS base
+FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=0
 
@@ -12,11 +12,13 @@ WORKDIR /src
 FROM base AS build
 ARG TARGETPLATFORM
 ARG TARGETOS
+ARG COMMIT_HASH
+ARG COMMIT_REF_SLUG
 
 RUN --mount=type=bind,target=/src,rw \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
-    GO_BINARY=xx-go WAIT4X_BUILD_OUTPUT=/usr/bin make build \
+    GO_BINARY=xx-go WAIT4X_BUILD_OUTPUT=/usr/bin WAIT4X_COMMIT_HASH=${COMMIT_HASH} WAIT4X_COMMIT_REF_SLUG=${COMMIT_REF_SLUG} make build \
     && xx-verify --static /usr/bin/wait4x*
 
 FROM scratch AS binary
@@ -35,13 +37,13 @@ RUN --mount=from=binary,target=/build \
   && tar -czvf "/out/wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" * \
   # Change dir to "/out" to prevent adding "/out" in the sha256sum command output.
   && cd /out \
-  && sha256sum -z "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" > "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz.sha256sum"
+  && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" > "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz.sha256sum"
 
 FROM scratch AS artifact
 COPY --from=releaser /out /
 
-FROM alpine:3.17.1
-RUN apk add --no-cache ca-certificates tzdata bash
+FROM alpine:3.22
+RUN apk add --update --no-cache ca-certificates tzdata bash
 
 COPY --from=binary /wait4x /usr/bin/wait4x
 

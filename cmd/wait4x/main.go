@@ -1,4 +1,4 @@
-// Copyright 2019 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main is the main package for the Wait4X application.
 package main
 
 import (
-	"wait4x.dev/v2/internal/app/wait4x/cmd"
+	"wait4x.dev/v3/internal/cmd"
 )
 
+// main is the main function for the Wait4X application
 func main() {
 	cmd.Execute()
 }

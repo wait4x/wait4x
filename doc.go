@@ -1,4 +1,4 @@
-// Copyright 2023 The Wait4X Authors
+// Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,5 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package wait4x allows you to wait for a port or a service to enter the requested state, with a customizable timeout and interval time.
-package wait4x // import "wait4x.dev/v2"
+// Package wait4x provides functionality to wait for services and ports to become available
+// or reach specific states. It supports configurable timeout durations and polling intervals,
+// making it suitable for service dependency management, health checking, and integration testing.
+//
+// Features:
+//   - Port availability checking
+//   - Service state monitoring
+//   - Configurable timeout and interval settings
+//   - Support for multiple protocols and service types
+//
+// For more information and examples, visit: https://wait4x.dev
+package wait4x // import "wait4x.dev/v3"

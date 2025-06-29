@@ -1,7 +1,5 @@
 // Special target: https://github.com/docker/metadata-action#bake-definition
-target "docker-metadata-action" {
-  tags = ["wait4x:local"]
-}
+target "docker-metadata-action" {}
 
 target "image" {
   inherits  = ["docker-metadata-action"]
