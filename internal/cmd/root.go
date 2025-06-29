@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/fang"
+	"github.com/charmbracelet/lipgloss/v2"
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zerologr"
@@ -192,7 +193,15 @@ func Execute() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	if err := fang.Execute(ctx, rootCmd); err != nil {
+	// Define the default color scheme for fang.
+	fangOpt := fang.WithColorSchemeFunc(fang.DefaultColorScheme)
+	if noColor, _ := rootCmd.Flags().GetBool("no-color"); noColor {
+		fangOpt = fang.WithColorSchemeFunc(func(_ lipgloss.LightDarkFunc) fang.ColorScheme {
+			return fang.ColorScheme{}
+		})
+	}
+
+	if err := fang.Execute(ctx, rootCmd, fangOpt); err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			os.Exit(ExitTimedOut)
 		}
