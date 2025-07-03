@@ -18,7 +18,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"runtime"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
@@ -26,6 +26,8 @@ import (
 	"wait4x.dev/v3/checker/exec"
 	"wait4x.dev/v3/internal/contextutil"
 	"wait4x.dev/v3/waiter"
+
+	"github.com/anmitsu/go-shlex"
 )
 
 // NewExecCommand creates a new exec sub-command
@@ -69,7 +71,13 @@ func runExec(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no command specified")
 	}
 
-	commandParts := strings.Fields(args[0])
+	// Split the command into parts using shlex, set posix mode for non-windows systems
+	commandParts, err := shlex.Split(args[0], runtime.GOOS != "windows")
+
+	if err != nil {
+		return err
+	}
+
 	command := commandParts[0]
 	var commandArgs []string
 
