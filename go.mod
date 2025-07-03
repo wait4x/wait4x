@@ -5,6 +5,7 @@ go 1.23.0
 toolchain go1.23.5
 
 require (
+	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be
 	github.com/antchfx/htmlquery v1.3.4
 	github.com/go-logr/logr v1.4.3
 	github.com/go-logr/stdr v1.2.2
