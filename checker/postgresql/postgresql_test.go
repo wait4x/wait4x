@@ -86,6 +86,31 @@ func (s *PostgreSQLSuite) TestValidAddress() {
 	s.Assert().Nil(chk.Check(ctx))
 }
 
+func (s *PostgreSQLSuite) TestTableNotExists() {
+	var expectedError *checker.ExpectedError
+
+	ctx := context.Background()
+
+	endpoint, err := s.container.ConnectionString(ctx)
+	s.Require().NoError(err)
+
+	chk := New(endpoint+"sslmode=disable", WithTableExists("not_existing_table"))
+
+	s.Assert().ErrorAs(chk.Check(ctx), &expectedError)
+}
+
+func (s *PostgreSQLSuite) TestTableExists() {
+	ctx := context.Background()
+
+	s.container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "postgres", "-c", "CREATE TABLE my_table (id INT)"})
+
+	endpoint, err := s.container.ConnectionString(ctx)
+	s.Require().NoError(err)
+
+	chk := New(endpoint+"sslmode=disable", WithTableExists("my_table"))
+	s.Assert().Nil(chk.Check(ctx))
+}
+
 // TestPostgreSQL runs the PostgreSQL test suite
 func TestPostgreSQL(t *testing.T) {
 	suite.Run(t, new(PostgreSQLSuite))
