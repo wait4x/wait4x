@@ -40,15 +40,15 @@
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| **Multi-Protocol** | TCP, HTTP, DNS, and more |
-| **Service Integrations** | Redis, MySQL, PostgreSQL, MongoDB, Kafka, RabbitMQ, InfluxDB, Temporal |
-| **Reverse/Parallel Checking** | Invert checks or check multiple services at once |
-| **Exponential Backoff** | Smarter retries |
-| **Cross-Platform** | Single binary for Linux, macOS, Windows |
-| **Go Package** | Use as a Go library |
-| **Command Execution** | Run commands after checks |
+| Feature                       | Description                                                            |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| **Multi-Protocol**            | TCP, HTTP, DNS, and more                                               |
+| **Service Integrations**      | Redis, MySQL, PostgreSQL, MongoDB, Kafka, RabbitMQ, InfluxDB, Temporal |
+| **Reverse/Parallel Checking** | Invert checks or check multiple services at once                       |
+| **Exponential Backoff**       | Smarter retries                                                        |
+| **Cross-Platform**            | Single binary for Linux, macOS, Windows                                |
+| **Go Package**                | Use as a Go library                                                    |
+| **Command Execution**         | Run commands after checks                                              |
 
 ## 📥 Installation
 
@@ -284,6 +284,10 @@ Check readiness for popular databases.
   ```bash
   wait4x mysql 'user:password@unix(/var/run/mysqld/mysqld.sock)/mydb'
   ```
+- **Check if a table exists:**
+  ```bash
+  wait4x mysql 'user:password@tcp(localhost:3306)/mydb' --table-exists my_table
+  ```
 
 #### PostgreSQL
 - **TCP connection:**
@@ -293,6 +297,14 @@ Check readiness for popular databases.
 - **Unix socket:**
   ```bash
   wait4x postgresql 'postgres://user:password@/mydb?host=/var/run/postgresql'
+  ```
+- **Check if a table exists:**
+  ```bash
+  wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable' --table-exists my_table
+  ```
+  If you need to specify a schema for the table existence check, you can use the `currentSchema=myschema` connection string parameter, for example:
+  ```bash
+  wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable&currentSchema=myschema' --table-exists my_table
   ```
 
 #### MongoDB
@@ -642,35 +654,35 @@ wait4x <command> --help
 
 ### Main Commands
 
-| Command        | Description                                       |
-|----------------|---------------------------------------------------|
-| `tcp`          | Wait for a TCP port to become available           |
-| `http`         | Wait for an HTTP(S) endpoint with advanced checks |
-| `dns`          | Wait for DNS records (A, AAAA, CNAME, MX, etc.)   |
-| `kafka`        | Wait for Kafka server                             |
-| `mysql`        | Wait for a MySQL database to be ready             |
-| `postgresql`   | Wait for a PostgreSQL database to be ready        |
-| `mongodb`      | Wait for a MongoDB database to be ready           |
-| `redis`        | Wait for a Redis server or key                    |
-| `influxdb`     | Wait for an InfluxDB server                       |
-| `rabbitmq`     | Wait for a RabbitMQ server                        |
-| `temporal`     | Wait for a Temporal server or worker              |
-| `exec`         | Wait for a shell command to succeed               |
+| Command      | Description                                       |
+| ------------ | ------------------------------------------------- |
+| `tcp`        | Wait for a TCP port to become available           |
+| `http`       | Wait for an HTTP(S) endpoint with advanced checks |
+| `dns`        | Wait for DNS records (A, AAAA, CNAME, MX, etc.)   |
+| `kafka`      | Wait for Kafka server                             |
+| `mysql`      | Wait for a MySQL database to be ready             |
+| `postgresql` | Wait for a PostgreSQL database to be ready        |
+| `mongodb`    | Wait for a MongoDB database to be ready           |
+| `redis`      | Wait for a Redis server or key                    |
+| `influxdb`   | Wait for an InfluxDB server                       |
+| `rabbitmq`   | Wait for a RabbitMQ server                        |
+| `temporal`   | Wait for a Temporal server or worker              |
+| `exec`       | Wait for a shell command to succeed               |
 
 Each command supports its own set of flags. See examples above or run `wait4x <command> --help` for details.
 
 ### Global Flags
 
-| Flag                                 | Description                                      |
-|--------------------------------------|--------------------------------------------------|
-| `--timeout`, `-t`                    | Set the maximum wait time (e.g., `30s`, `2m`)     |
-| `--interval`, `-i`                   | Set the interval between checks (default: 1s)     |
-| `--invert-check`                     | Invert the check (wait for NOT ready)             |
-| `--backoff-policy`                   | Retry policy: `linear` or `exponential`           |
-| `--backoff-exponential-coefficient`  | Exponential backoff multiplier (default: 2.0)     |
-| `--backoff-exponential-max-interval` | Max interval for exponential backoff              |
-| `--quiet`                            | Suppress output except errors                     |
-| `--no-color`                         | Disable colored output                            |
+| Flag                                 | Description                                   |
+| ------------------------------------ | --------------------------------------------- |
+| `--timeout`, `-t`                    | Set the maximum wait time (e.g., `30s`, `2m`) |
+| `--interval`, `-i`                   | Set the interval between checks (default: 1s) |
+| `--invert-check`                     | Invert the check (wait for NOT ready)         |
+| `--backoff-policy`                   | Retry policy: `linear` or `exponential`       |
+| `--backoff-exponential-coefficient`  | Exponential backoff multiplier (default: 2.0) |
+| `--backoff-exponential-max-interval` | Max interval for exponential backoff          |
+| `--quiet`                            | Suppress output except errors                 |
+| `--no-color`                         | Disable colored output                        |
 
 ### Getting Help
 
