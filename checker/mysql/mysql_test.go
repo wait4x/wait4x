@@ -86,6 +86,30 @@ func (s *MySQLSuite) TestValidAddress() {
 	s.Assert().Nil(chk.Check(ctx))
 }
 
+func (s *MySQLSuite) TestTableNotExists() {
+	var expectedError *checker.ExpectedError
+
+	ctx := context.Background()
+
+	endpoint, err := s.container.ConnectionString(ctx)
+	s.Require().NoError(err)
+
+	chk := New(endpoint, WithTableExists("not_existing_table"))
+	s.Assert().ErrorAs(chk.Check(ctx), &expectedError)
+}
+
+func (s *MySQLSuite) TestTableExists() {
+	ctx := context.Background()
+
+	s.container.Exec(ctx, []string{"mysql", "-u", "root", "-p", "password", "-e", "CREATE TABLE my_table (id INT)"})
+
+	endpoint, err := s.container.ConnectionString(ctx)
+	s.Require().NoError(err)
+
+	chk := New(endpoint, WithTableExists("my_table"))
+	s.Assert().Nil(chk.Check(ctx))
+}
+
 // TestMySQL runs the MySQL test suite
 func TestMySQL(t *testing.T) {
 	suite.Run(t, new(MySQLSuite))

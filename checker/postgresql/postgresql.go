@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+
 	"wait4x.dev/v3/checker"
 
 	// Needed for the PostgreSQL driver
@@ -29,18 +30,38 @@ import (
 
 var hidePasswordRegexp = regexp.MustCompile(`^(postgres://[^/:]+):[^:@]+@`)
 
+const (
+	tableExistsQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s')"
+)
+
+// Option is a function that configures the PostgreSQL checker
+type Option func(p *PostgreSQL)
+
 // PostgreSQL is a PostgreSQL checker
 type PostgreSQL struct {
-	dsn string
+	dsn         string
+	tableExists string
 }
 
 // New creates a new PostgreSQL checker
-func New(dsn string) checker.Checker {
+func New(dsn string, opts ...Option) checker.Checker {
 	p := &PostgreSQL{
 		dsn: dsn,
 	}
 
+	// apply the list of options to PostgreSQL
+	for _, opt := range opts {
+		opt(p)
+	}
+
 	return p
+}
+
+// WithTableExists configures the table existence check
+func WithTableExists(table string) Option {
+	return func(p *PostgreSQL) {
+		p.tableExists = table
+	}
 }
 
 // Identity returns the identity of the PostgreSQL checker
@@ -76,6 +97,22 @@ func (p *PostgreSQL) Check(ctx context.Context) (err error) {
 		}
 
 		return err
+	}
+
+	// check if the table exists if option has been set
+	if p.tableExists != "" {
+		query := fmt.Sprintf(tableExistsQuery, p.tableExists)
+		var exists bool
+		err = db.QueryRowContext(ctx, query).Scan(&exists)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return checker.NewExpectedError(
+				"table does not exist", nil,
+				"table", p.tableExists,
+			)
+		}
 	}
 
 	return nil
