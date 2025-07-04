@@ -27,18 +27,38 @@ import (
 
 var hidePasswordRegexp = regexp.MustCompile(`^([^:]+):[^:@]+@`)
 
+const (
+	tableExistsQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s')"
+)
+
 // MySQL is a MySQL checker
 type MySQL struct {
-	dsn string
+	dsn         string
+	tableExists string
 }
 
+// Option is a function that configures the MySQL checker
+type Option func(m *MySQL)
+
 // New creates a new MySQL checker
-func New(dsn string) checker.Checker {
+func New(dsn string, opts ...Option) checker.Checker {
 	m := &MySQL{
 		dsn: dsn,
 	}
 
+	// apply the list of options to MySQL
+	for _, opt := range opts {
+		opt(m)
+	}
+
 	return m
+}
+
+// WithTableExists configures the table existence check
+func WithTableExists(table string) Option {
+	return func(m *MySQL) {
+		m.tableExists = table
+	}
 }
 
 // Identity returns the identity of the MySQL checker
@@ -74,6 +94,22 @@ func (m *MySQL) Check(ctx context.Context) (err error) {
 		}
 
 		return err
+	}
+
+	// check if the table exists if option has been set
+	if m.tableExists != "" {
+		query := fmt.Sprintf(tableExistsQuery, m.tableExists)
+		var exists bool
+		err = db.QueryRowContext(ctx, query).Scan(&exists)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return checker.NewExpectedError(
+				"table does not exist", nil,
+				"table", m.tableExists,
+			)
+		}
 	}
 
 	return nil
