@@ -23,6 +23,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
+	"github.com/testcontainers/testcontainers-go/wait"
 	"wait4x.dev/v3/checker"
 )
 
@@ -39,6 +40,7 @@ func (s *MySQLSuite) SetupSuite() {
 		context.Background(),
 		"mysql:8.0.36",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
+		testcontainers.WithWaitStrategy(wait.ForListeningPort("33060")),
 	)
 
 	s.Require().NoError(err)
@@ -101,7 +103,8 @@ func (s *MySQLSuite) TestTableNotExists() {
 func (s *MySQLSuite) TestExpectTable() {
 	ctx := context.Background()
 
-	s.container.Exec(ctx, []string{"mysql", "-u", "root", "-p", "password", "-e", "CREATE TABLE my_table (id INT)"})
+	_, _, err := s.container.Exec(ctx, []string{"mysql", "-u", "test", "-ptest", "-D", "test", "-e", "CREATE TABLE my_table (id INT)"})
+	s.Require().NoError(err)
 
 	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
