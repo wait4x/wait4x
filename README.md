@@ -286,7 +286,7 @@ Check readiness for popular databases.
   ```
 - **Check if a table exists:**
   ```bash
-  wait4x mysql 'user:password@tcp(localhost:3306)/mydb' --table-exists my_table
+  wait4x mysql 'user:password@tcp(localhost:3306)/mydb' --expect-table my_table
   ```
 
 #### PostgreSQL
@@ -300,11 +300,11 @@ Check readiness for popular databases.
   ```
 - **Check if a table exists:**
   ```bash
-  wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable' --table-exists my_table
+  wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable' --expect-table my_table
   ```
   If you need to specify a schema for the table existence check, you can use the `currentSchema=myschema` connection string parameter, for example:
   ```bash
-  wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable&currentSchema=myschema' --table-exists my_table
+  wait4x postgresql 'postgres://user:password@localhost:5432/mydb?sslmode=disable&currentSchema=myschema' --expect-table my_table
   ```
 
 #### MongoDB

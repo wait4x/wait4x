@@ -94,12 +94,12 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithTableExists("not_existing_table"))
+	chk := New(endpoint+"sslmode=disable", WithExpectTable("not_existing_table"))
 
 	s.Assert().ErrorAs(chk.Check(ctx), &expectedError)
 }
 
-func (s *PostgreSQLSuite) TestTableExists() {
+func (s *PostgreSQLSuite) TestExpectTable() {
 	ctx := context.Background()
 
 	s.container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "postgres", "-c", "CREATE TABLE my_table (id INT)"})
@@ -107,7 +107,7 @@ func (s *PostgreSQLSuite) TestTableExists() {
 	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithTableExists("my_table"))
+	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))
 	s.Assert().Nil(chk.Check(ctx))
 }
 

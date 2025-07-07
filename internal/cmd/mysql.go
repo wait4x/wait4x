@@ -68,14 +68,14 @@ func runMysql(cmd *cobra.Command, args []string) error {
 		args = args[:i]
 	}
 
-	tableExists, err := cmd.Flags().GetString("table-exists")
+	expectTable, err := cmd.Flags().GetString("table-exists")
 	if err != nil {
-		return fmt.Errorf("failed to parse --table-exists flag: %w", err)
+		return fmt.Errorf("failed to parse --expect-table flag: %w", err)
 	}
 
 	checkers := make([]checker.Checker, len(args))
 	for i, arg := range args {
-		checkers[i] = mysql.New(arg, mysql.WithTableExists(tableExists))
+		checkers[i] = mysql.New(arg, mysql.WithExpectTable(expectTable))
 	}
 
 	return waiter.WaitParallelContext(

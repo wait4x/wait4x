@@ -94,11 +94,11 @@ func (s *MySQLSuite) TestTableNotExists() {
 	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
-	chk := New(endpoint, WithTableExists("not_existing_table"))
+	chk := New(endpoint, WithExpectTable("not_existing_table"))
 	s.Assert().ErrorAs(chk.Check(ctx), &expectedError)
 }
 
-func (s *MySQLSuite) TestTableExists() {
+func (s *MySQLSuite) TestExpectTable() {
 	ctx := context.Background()
 
 	s.container.Exec(ctx, []string{"mysql", "-u", "root", "-p", "password", "-e", "CREATE TABLE my_table (id INT)"})
@@ -106,7 +106,7 @@ func (s *MySQLSuite) TestTableExists() {
 	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
-	chk := New(endpoint, WithTableExists("my_table"))
+	chk := New(endpoint, WithExpectTable("my_table"))
 	s.Assert().Nil(chk.Check(ctx))
 }
 

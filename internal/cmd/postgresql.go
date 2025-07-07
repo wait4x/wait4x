@@ -61,9 +61,9 @@ func runPostgresql(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("unable to get logger from context: %w", err)
 	}
 
-	tableExists, err := cmd.Flags().GetString("table-exists")
+	expectTable, err := cmd.Flags().GetString("table-exists")
 	if err != nil {
-		return fmt.Errorf("failed to parse --table-exists flag: %w", err)
+		return fmt.Errorf("failed to parse --expect-table flag: %w", err)
 	}
 
 	// ArgsLenAtDash returns -1 when -- was not specified
@@ -73,7 +73,7 @@ func runPostgresql(cmd *cobra.Command, args []string) error {
 
 	checkers := make([]checker.Checker, len(args))
 	for i, arg := range args {
-		checkers[i] = postgresql.New(arg, postgresql.WithTableExists(tableExists))
+		checkers[i] = postgresql.New(arg, postgresql.WithExpectTable(expectTable))
 	}
 
 	return waiter.WaitParallelContext(

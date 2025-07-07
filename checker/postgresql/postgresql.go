@@ -31,7 +31,7 @@ import (
 var hidePasswordRegexp = regexp.MustCompile(`^(postgres://[^/:]+):[^:@]+@`)
 
 const (
-	tableExistsQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s')"
+	expectTableQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s')"
 )
 
 // Option is a function that configures the PostgreSQL checker
@@ -40,7 +40,7 @@ type Option func(p *PostgreSQL)
 // PostgreSQL is a PostgreSQL checker
 type PostgreSQL struct {
 	dsn         string
-	tableExists string
+	expectTable string
 }
 
 // New creates a new PostgreSQL checker
@@ -57,10 +57,10 @@ func New(dsn string, opts ...Option) checker.Checker {
 	return p
 }
 
-// WithTableExists configures the table existence check
-func WithTableExists(table string) Option {
+// WithExpectTable configures the table existence check
+func WithExpectTable(table string) Option {
 	return func(p *PostgreSQL) {
-		p.tableExists = table
+		p.expectTable = table
 	}
 }
 
@@ -100,8 +100,8 @@ func (p *PostgreSQL) Check(ctx context.Context) (err error) {
 	}
 
 	// check if the table exists if option has been set
-	if p.tableExists != "" {
-		query := fmt.Sprintf(tableExistsQuery, p.tableExists)
+	if p.expectTable != "" {
+		query := fmt.Sprintf(expectTableQuery, p.expectTable)
 		var exists bool
 		err = db.QueryRowContext(ctx, query).Scan(&exists)
 		if err != nil {
@@ -110,7 +110,7 @@ func (p *PostgreSQL) Check(ctx context.Context) (err error) {
 		if !exists {
 			return checker.NewExpectedError(
 				"table does not exist", nil,
-				"table", p.tableExists,
+				"table", p.expectTable,
 			)
 		}
 	}
