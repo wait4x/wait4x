@@ -68,7 +68,7 @@ func runMysql(cmd *cobra.Command, args []string) error {
 		args = args[:i]
 	}
 
-	expectTable, err := cmd.Flags().GetString("table-exists")
+	expectTable, err := cmd.Flags().GetString("expect-table")
 	if err != nil {
 		return fmt.Errorf("failed to parse --expect-table flag: %w", err)
 	}
