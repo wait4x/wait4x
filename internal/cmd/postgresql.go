@@ -61,7 +61,7 @@ func runPostgresql(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("unable to get logger from context: %w", err)
 	}
 
-	expectTable, err := cmd.Flags().GetString("table-exists")
+	expectTable, err := cmd.Flags().GetString("expect-table")
 	if err != nil {
 		return fmt.Errorf("failed to parse --expect-table flag: %w", err)
 	}
