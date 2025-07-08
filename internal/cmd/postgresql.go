@@ -50,7 +50,7 @@ func NewPostgresqlCommand() *cobra.Command {
 		RunE: runPostgresql,
 	}
 
-	postgresqlCommand.Flags().String("table-exists", "", "Check if a table exists in the database")
+	postgresqlCommand.Flags().String("expect-table", "", "Expect a table to exist in the database")
 
 	return postgresqlCommand
 }
