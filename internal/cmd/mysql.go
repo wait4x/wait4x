@@ -52,7 +52,7 @@ func NewMysqlCommand() *cobra.Command {
 		RunE: runMysql,
 	}
 
-	mysqlCommand.Flags().String("table-exists", "", "Check if a table exists in the database")
+	mysqlCommand.Flags().String("expect-table", "", "Expect a table to exist in the database")
 
 	return mysqlCommand
 }
