@@ -23,6 +23,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
 	"wait4x.dev/v3/checker"
 )
 
@@ -39,6 +40,7 @@ func (s *PostgreSQLSuite) SetupSuite() {
 		context.Background(),
 		"postgres:16-alpine",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
+		testcontainers.WithWaitStrategy(wait.ForListeningPort("5432")),
 	)
 
 	s.Require().NoError(err)
@@ -83,6 +85,31 @@ func (s *PostgreSQLSuite) TestValidAddress() {
 	s.Require().NoError(err)
 
 	chk := New(endpoint + "sslmode=disable")
+	s.Assert().Nil(chk.Check(ctx))
+}
+
+func (s *PostgreSQLSuite) TestTableNotExists() {
+	var expectedError *checker.ExpectedError
+
+	ctx := context.Background()
+
+	endpoint, err := s.container.ConnectionString(ctx)
+	s.Require().NoError(err)
+
+	chk := New(endpoint+"sslmode=disable", WithExpectTable("not_existing_table"))
+
+	s.Assert().ErrorAs(chk.Check(ctx), &expectedError)
+}
+
+func (s *PostgreSQLSuite) TestExpectTable() {
+	ctx := context.Background()
+	endpoint, err := s.container.ConnectionString(ctx)
+	s.Require().NoError(err)
+
+	_, _, err = s.container.Exec(ctx, []string{"psql", `postgresql://postgres:postgres@localhost:5432/postgres`, "-c", "CREATE TABLE my_table (id INT)"})
+	s.Require().NoError(err)
+
+	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))
 	s.Assert().Nil(chk.Check(ctx))
 }
 
