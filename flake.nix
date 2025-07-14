@@ -28,6 +28,7 @@
           golangci-lint
           delve
           git
+          gh
           gnumake
         ];
       };
@@ -37,7 +38,7 @@
         src = self;
         vendorHash = "sha256-ODcHrmmHHeZbi1HVDkYPCyHs7mcs2UGdBzicP1+eOSI=";
         doCheck = false;
-        nativeBuildInputs = with pkgs; [ git ];
+        nativeBuildInputs = with pkgs; [git];
         GOCACHE = "$(mktemp -d)";
       };
     });
