@@ -84,7 +84,7 @@ func TestWaitLogger(t *testing.T) {
 	err := WaitContext(context.TODO(), mockChecker, WithLogger(log), WithTimeout(time.Second))
 
 	assert.Equal(t, context.DeadlineExceeded, err)
-	assert.Contains(t, buf.String(), "INFO [MockChecker] Checking the ID ...")
+	assert.Contains(t, buf.String(), "INFO [MockChecker] Checking ID ...")
 	assert.Contains(t, buf.String(), "error message")
 	mockChecker.AssertExpectations(t)
 }

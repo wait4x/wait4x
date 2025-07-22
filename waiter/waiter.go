@@ -190,7 +190,7 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 	retries := 0
 
 	for {
-		options.logger.Info(fmt.Sprintf("[%s] Checking the %s ...", chkName, chkID))
+		options.logger.Info(fmt.Sprintf("[%s] Checking %s ...", chkName, chkID))
 
 		err := chk.Check(ctx)
 		if err != nil {
