@@ -69,6 +69,37 @@ docker run --rm wait4x/wait4x:latest --help
 </details>
 
 <details>
+<summary><b>📦 From Package Managers</b></summary>
+
+**macOS:**
+```bash
+brew install wait4x
+```
+
+**Alpine Linux:**
+```bash
+apk add wait4x
+```
+
+**Arch Linux (AUR):**
+```bash
+yay -S wait4x-bin
+```
+
+**NixOS:**
+```bash
+nix-env -iA nixpkgs.wait4x
+```
+
+**Windows (Scoop):**
+```bash
+scoop install wait4x
+```
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/wait4x.svg?exclude_unsupported=1)](https://repology.org/project/wait4x/versions)
+</details>
+
+<details>
 <summary><b>📦 From Binary</b></summary>
 
 Download the appropriate version for your platform from the [releases page](https://github.com/wait4x/wait4x/releases):
@@ -99,32 +130,6 @@ tar -xf wait4x-windows-amd64.tar.gz
 curl -LO https://github.com/wait4x/wait4x/releases/latest/download/wait4x-linux-amd64.tar.gz.sha256sum
 sha256sum --check wait4x-linux-amd64.tar.gz.sha256sum
 ```
-</details>
-
-<details>
-<summary><b>📦 From Package Managers</b></summary>
-
-**Alpine Linux:**
-```bash
-apk add wait4x
-```
-
-**Arch Linux (AUR):**
-```bash
-yay -S wait4x-bin
-```
-
-**NixOS:**
-```bash
-nix-env -iA nixpkgs.wait4x
-```
-
-**Windows (Scoop):**
-```bash
-scoop install wait4x
-```
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/wait4x.svg?exclude_unsupported=1)](https://repology.org/project/wait4x/versions)
 </details>
 
 <details>
