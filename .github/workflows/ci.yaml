@@ -130,7 +130,13 @@ jobs:
 
       - name: Move artifacts
         run: |
-          mv ./dist/**/* ./dist/
+          # Move all files except SHA256SUMS to the main dist directory
+          find ./dist -type f -not -name "SHA256SUMS" -exec mv {} ./dist/ \;
+          # Combine all SHA256SUMS files into one
+          find ./dist -name "SHA256SUMS" -exec cat {} \; | sort -u > ./dist/SHA256SUMS.combined
+          mv ./dist/SHA256SUMS.combined ./dist/SHA256SUMS
+          # Remove empty directories
+          find ./dist -type d -empty -delete
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
