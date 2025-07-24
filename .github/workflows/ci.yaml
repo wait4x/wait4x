@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   check:
@@ -85,19 +86,27 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           # Maintaining "atkrad/wait4x" for backward compatibility
+          # Note: This will be removed in v4.0.0. Please use the "wait4x/wait4x" image going forward.
           images: | 
             atkrad/wait4x
             wait4x/wait4x
+            ghcr.io/${{ github.repository }}
           ### versioning strategy
           ### push semver tag v3.2.1 on the default branch
           # wait4x/wait4x:2.2.0
           # wait4x/wait4x:2.2
           # wait4x/wait4x:2
           # wait4x/wait4x:latest
+          # ghcr.io/wait4x/wait4x:2.2.0
+          # ghcr.io/wait4x/wait4x:2.2
+          # ghcr.io/wait4x/wait4x:2
+          # ghcr.io/wait4x/wait4x:latest
           ### push semver pre-release tag v3.0.0-beta.1 on the default branch
           # wait4x/wait4x:3.0.0-beta.1
+          # ghcr.io/wait4x/wait4x:3.0.0-beta.1
           ### push on the default branch
           # wait4x/wait4x:edge
+          # ghcr.io/wait4x/wait4x:edge
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -112,12 +121,20 @@ jobs:
             [worker.oci]
               max-parallelism = 10
 
-      - name: Login to DockerHub
+      - name: Login to Docker Hub (docker.io)
         if: ${{ github.event_name != 'pull_request' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry (ghcr.io)
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build artifacts
         uses: docker/bake-action@v6
@@ -173,5 +190,6 @@ jobs:
           files: |
             dist/*.tar.gz
             dist/*.sha256sum
+            dist/SHA256SUMS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
