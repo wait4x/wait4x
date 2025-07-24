@@ -37,7 +37,9 @@ RUN --mount=from=binary,target=/build \
   && tar -czvf "/out/wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" * \
   # Change dir to "/out" to prevent adding "/out" in the sha256sum command output.
   && cd /out \
-  && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" > "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz.sha256sum"
+  # Note: This will be removed in v4.0.0. Please use the SHA256SUMS file going forward.
+  && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" > "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz.sha256sum" \
+  && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" >> "SHA256SUMS"
 
 FROM scratch AS artifact
 COPY --from=releaser /out /
