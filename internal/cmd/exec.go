@@ -18,10 +18,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
+	"mvdan.cc/sh/v3/shell"
 
 	"wait4x.dev/v3/checker/exec"
 	"wait4x.dev/v3/internal/contextutil"
@@ -69,7 +69,13 @@ func runExec(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no command specified")
 	}
 
-	commandParts := strings.Fields(args[0])
+	// Split the command into parts using shell parser
+	commandParts, err := shell.Fields(args[0], nil)
+
+	if err != nil {
+		return err
+	}
+
 	command := commandParts[0]
 	var commandArgs []string
 
