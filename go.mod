@@ -29,7 +29,7 @@ require (
 	github.com/tidwall/gjson v1.18.0
 	github.com/tonglil/buflogr v1.1.1
 	go.mongodb.org/mongo-driver v1.17.4
-	go.temporal.io/api v1.50.0
+	go.temporal.io/api v1.51.0
 	google.golang.org/grpc v1.71.0
 )
 
