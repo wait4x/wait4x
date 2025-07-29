@@ -193,13 +193,14 @@ func Execute() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	// Define the default color scheme for fang.
-	fangOpt := fang.WithColorSchemeFunc(fang.DefaultColorScheme)
-	if noColor, _ := rootCmd.Flags().GetBool("no-color"); noColor {
-		fangOpt = fang.WithColorSchemeFunc(func(_ lipgloss.LightDarkFunc) fang.ColorScheme {
+	// Create a custom fang option that checks the flag after parsing
+	fangOpt := fang.WithColorSchemeFunc(func(fn lipgloss.LightDarkFunc) fang.ColorScheme {
+		// Check if no-color flag is set after parsing
+		if noColor, _ := rootCmd.PersistentFlags().GetBool("no-color"); noColor {
 			return fang.ColorScheme{}
-		})
-	}
+		}
+		return fang.DefaultColorScheme(fn)
+	})
 
 	if err := fang.Execute(ctx, rootCmd, fangOpt); err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
