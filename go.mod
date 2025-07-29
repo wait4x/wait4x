@@ -31,6 +31,7 @@ require (
 	go.mongodb.org/mongo-driver v1.17.4
 	go.temporal.io/api v1.51.0
 	google.golang.org/grpc v1.71.0
+	mvdan.cc/sh/v3 v3.12.0
 )
 
 require (
