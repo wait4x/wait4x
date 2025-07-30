@@ -41,7 +41,7 @@ type S3Suite struct {
 // SetupSuite starts a LocalStack container and creates a test bucket
 func (s *S3Suite) SetupSuite() {
 	ctx := context.Background()
-	
+
 	var err error
 	s.container, err = localstack.Run(
 		ctx,
@@ -113,14 +113,14 @@ func (s *S3Suite) TestParseBucketName() {
 // TestNew tests the creation of a new S3 checker
 func (s *S3Suite) TestNew() {
 	checker := New("my-bucket")
-	
+
 	s.Assert().Equal("my-bucket", checker.bucketName)
 }
 
 // TestIdentity tests the identity of the S3 checker
 func (s *S3Suite) TestIdentity() {
 	checker := New("test-bucket")
-	
+
 	identity, err := checker.Identity()
 	s.Require().NoError(err)
 	s.Assert().Equal("test-bucket", identity)
@@ -129,45 +129,45 @@ func (s *S3Suite) TestIdentity() {
 // TestString tests the string representation of the S3 checker
 func (s *S3Suite) TestString() {
 	checker := New("test-bucket")
-	
+
 	expected := "S3 bucket: test-bucket"
 	result := checker.String()
-	
+
 	s.Assert().Equal(expected, result)
 }
 
 // TestWithRegion tests the WithRegion option
 func (s *S3Suite) TestWithRegion() {
 	checker := New("my-bucket", WithRegion("us-west-2"))
-	
+
 	s.Assert().Equal("us-west-2", checker.region)
 }
 
 // TestWithClient tests the WithClient option
 func (s *S3Suite) TestWithClient() {
 	checker := New("my-bucket", WithClient(s.s3Client))
-	
+
 	s.Assert().Equal(s.s3Client, checker.client)
 }
 
 // TestValidBucket tests checking an existing bucket
 func (s *S3Suite) TestValidBucket() {
 	ctx := context.Background()
-	
+
 	checker := New(s.testBucket, WithClient(s.s3Client))
 	err := checker.Check(ctx)
-	
+
 	s.Assert().NoError(err)
 }
 
 // TestMissingBucket tests checking a non-existent bucket
 func (s *S3Suite) TestMissingBucket() {
 	ctx := context.Background()
-	
+
 	var expectedError *checker.ExpectedError
 	checker := New(s.missingBucket, WithClient(s.s3Client))
 	err := checker.Check(ctx)
-	
+
 	s.Assert().ErrorAs(err, &expectedError)
 	s.Assert().Contains(err.Error(), "does not exist or is not accessible")
 }
@@ -175,13 +175,13 @@ func (s *S3Suite) TestMissingBucket() {
 // TestBucketPathFormats tests different bucket path formats
 func (s *S3Suite) TestBucketPathFormats() {
 	ctx := context.Background()
-	
+
 	testCases := []string{
 		s.testBucket,
 		"s3://" + s.testBucket,
 		"arn:aws:s3:::" + s.testBucket,
 	}
-	
+
 	for _, bucketPath := range testCases {
 		s.T().Run(bucketPath, func(t *testing.T) {
 			checker := New(bucketPath, WithClient(s.s3Client))
