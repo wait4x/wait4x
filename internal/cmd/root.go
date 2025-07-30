@@ -30,6 +30,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 
+	"wait4x.dev/v4/internal/cmd/aws"
 	"wait4x.dev/v4/internal/cmd/dns"
 	"wait4x.dev/v4/internal/cmd/temporal"
 	"wait4x.dev/v4/internal/contextutil"
@@ -185,6 +186,7 @@ func Execute() {
 	rootCmd.AddCommand(NewRabbitMQCommand())
 	rootCmd.AddCommand(NewRedisCommand())
 	rootCmd.AddCommand(temporal.NewTemporalCommand())
+	rootCmd.AddCommand(aws.NewAWSCommand())
 	rootCmd.AddCommand(NewVersionCommand())
 	rootCmd.AddCommand(NewExecCommand())
 
