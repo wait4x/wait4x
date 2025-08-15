@@ -26,6 +26,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/localstack"
+
 	"wait4x.dev/v3/checker"
 )
 
@@ -124,23 +125,6 @@ func (s *S3Suite) TestIdentity() {
 	identity, err := checker.Identity()
 	s.Require().NoError(err)
 	s.Assert().Equal("test-bucket", identity)
-}
-
-// TestString tests the string representation of the S3 checker
-func (s *S3Suite) TestString() {
-	checker := New("test-bucket")
-
-	expected := "S3 bucket: test-bucket"
-	result := checker.String()
-
-	s.Assert().Equal(expected, result)
-}
-
-// TestWithRegion tests the WithRegion option
-func (s *S3Suite) TestWithRegion() {
-	checker := New("my-bucket", WithRegion("us-west-2"))
-
-	s.Assert().Equal("us-west-2", checker.region)
 }
 
 // TestWithClient tests the WithClient option

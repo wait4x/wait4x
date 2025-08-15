@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !disable_aws_s3
+
+// Package cmd provides the command-line interface for the Wait4X application.
 package aws
 
 import (
@@ -20,6 +23,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
+
 	"wait4x.dev/v3/checker"
 	"wait4x.dev/v3/checker/aws/s3"
 	"wait4x.dev/v3/internal/contextutil"

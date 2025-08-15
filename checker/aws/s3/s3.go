@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package s3 provides the S3 bucket checker for the Wait4X application.
 package s3
 
 import (
@@ -23,6 +24,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+
 	"wait4x.dev/v3/checker"
 )
 
@@ -102,20 +104,8 @@ func (c *Checker) Check(ctx context.Context) error {
 	return nil
 }
 
-// String returns a string representation of the checker.
-func (c *Checker) String() string {
-	return fmt.Sprintf("S3 bucket: %s", c.bucketName)
-}
-
 // Option is a functional option type for configuring the S3 checker.
 type Option func(*Checker)
-
-// WithRegion sets the AWS region for the S3 checker.
-func WithRegion(region string) Option {
-	return func(c *Checker) {
-		c.region = region
-	}
-}
 
 // WithClient sets a custom S3 client for the checker.
 func WithClient(client *s3.Client) Option {
