@@ -27,6 +27,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 	"wait4x.dev/v3/checker"
 )
 
@@ -84,6 +86,23 @@ func TestHttpValidStatusCode(t *testing.T) {
 // TestHttpInvalidTLS tests the HTTP checker with an invalid TLS certificate.
 func TestHttpInvalidTLS(t *testing.T) {
 	hc := New("https://expired.badssl.com", WithInsecureSkipTLSVerify(true))
+	assert.Nil(t, hc.Check(context.TODO()))
+}
+
+func TestHttpH2CEnabled_Succeeds(t *testing.T) {
+	h2cOnly := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor != 2 {
+			http.Error(w, "h2c required", http.StatusHTTPVersionNotSupported)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	srv := httptest.NewUnstartedServer(h2c.NewHandler(h2cOnly, &http2.Server{}))
+	srv.Start()
+	defer srv.Close()
+
+	hc := New(srv.URL, WithTimeout(2*time.Second), WithNoRedirect(true), WithH2C(true), WithExpectStatusCode(http.StatusOK))
 	assert.Nil(t, hc.Check(context.TODO()))
 }
 

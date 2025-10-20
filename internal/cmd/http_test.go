@@ -22,6 +22,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 	"wait4x.dev/v3/internal/test"
 
 	"github.com/stretchr/testify/assert"
@@ -124,4 +127,35 @@ func TestHTTPRequestHeaderFail(t *testing.T) {
 	)
 
 	assert.Contains(t, err.Error(), "can't parse the request header")
+}
+
+func TestHTTPH2CFlagSuccess(t *testing.T) {
+	t.Setenv("HTTP_PROXY", "")
+	t.Setenv("NO_PROXY", "*")
+
+	h2cOnly := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor != 2 {
+			http.Error(w, "h2c required", http.StatusHTTPVersionNotSupported)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	srv := httptest.NewUnstartedServer(h2c.NewHandler(h2cOnly, &http2.Server{}))
+	srv.Start()
+	defer srv.Close()
+
+	rootCmd := NewRootCommand()
+	rootCmd.AddCommand(NewHTTPCommand())
+
+	_, err := test.ExecuteCommand(
+		rootCmd,
+		"http",
+		srv.URL,
+		"--h2c",
+		"--no-redirect",
+		"--expect-status-code", "200",
+		"-t", "2s",
+	)
+	assert.Nil(t, err)
 }

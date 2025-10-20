@@ -121,6 +121,7 @@ func NewHTTPCommand() *cobra.Command {
 		String("cert-file", "", "Utilize this SSL certificate file to identify the HTTPS client.")
 	httpCommand.Flags().
 		String("key-file", "", "Utilize this SSL key file to identify the HTTPS client.")
+	httpCommand.Flags().Bool("h2c", false, "Enable HTTP/2 cleartext (h2c) for http:// URLs.")
 
 	return httpCommand
 }
@@ -139,6 +140,7 @@ func runHTTP(cmd *cobra.Command, args []string) error {
 	caFile, _ := cmd.Flags().GetString("ca-file")
 	certFile, _ := cmd.Flags().GetString("cert-file")
 	keyFile, _ := cmd.Flags().GetString("key-file")
+	h2c, _ := cmd.Flags().GetBool("h2c")
 
 	logger, err := logr.FromContext(cmd.Context())
 	if err != nil {
@@ -193,6 +195,7 @@ func runHTTP(cmd *cobra.Command, args []string) error {
 			http.WithCAFile(caFile),
 			http.WithCertFile(certFile),
 			http.WithKeyFile(keyFile),
+			http.WithH2C(h2c),
 		)
 	}
 
