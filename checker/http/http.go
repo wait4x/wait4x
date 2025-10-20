@@ -21,7 +21,9 @@ import (
 	"crypto/x509"
 	"errors"
 	"io"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -29,6 +31,7 @@ import (
 
 	"github.com/antchfx/htmlquery"
 	"github.com/tidwall/gjson"
+	"golang.org/x/net/http2"
 	"wait4x.dev/v3/checker"
 )
 
@@ -60,6 +63,7 @@ type HTTP struct {
 	caFile                string
 	certFile              string
 	keyFile               string
+	h2c                   bool
 }
 
 // New creates the HTTP checker
@@ -180,6 +184,13 @@ func WithKeyFile(path string) Option {
 	}
 }
 
+// WithH2C enables prior-knowledge HTTP/2 over cleartext (h2c) for http:// URLs.
+func WithH2C(enable bool) Option {
+	return func(h *HTTP) {
+		h.h2c = enable
+	}
+}
+
 // Identity returns the identity of the checker
 func (h *HTTP) Identity() (string, error) {
 	return h.address, nil
@@ -191,12 +202,36 @@ func (h *HTTP) Check(ctx context.Context) (err error) {
 	if err != nil {
 		return
 	}
+
+	// Base transport (also used for HTTPS and for HTTP when h2c is not applicable).
+	baseTransport := &http.Transport{
+		TLSClientConfig: tlsConfig,
+		Proxy:           http.ProxyFromEnvironment,
+	}
+
+	transport := http.RoundTripper(baseTransport)
+
+	// Opt-in h2c (prior-knowledge) for cleartext HTTP when:
+	// - explicitly enabled,
+	// - scheme is http,
+	// - no proxy is configured for this URL,
+	// - noRedirect is true (avoid redirect cross-scheme issues with a single transport).
+	if h.h2c && h.noRedirect {
+		if u, perr := url.Parse(h.address); perr == nil && strings.EqualFold(u.Scheme, "http") {
+			if p, _ := http.ProxyFromEnvironment(&http.Request{URL: u}); p == nil {
+				transport = &http2.Transport{
+					AllowHTTP: true,
+					DialTLS: func(network, addr string, _ *tls.Config) (net.Conn, error) {
+						return net.DialTimeout(network, addr, h.timeout)
+					},
+				}
+			}
+		}
+	}
+
 	httpClient := &http.Client{
-		Timeout: h.timeout,
-		Transport: &http.Transport{
-			TLSClientConfig: tlsConfig,
-			Proxy:           http.ProxyFromEnvironment,
-		},
+		Timeout:   h.timeout,
+		Transport: transport,
 	}
 
 	if h.noRedirect {
