@@ -57,15 +57,34 @@
 <details>
 <summary><b>🐳 With Docker</b></summary>
 
-Wait4X provides automatically updated Docker images within Docker Hub:
+Wait4X provides automatically updated Docker images within Docker Hub in two variants:
+
+**Alpine (default) - Minimal size (~10-15 MB):**
 
 ```bash
-# Pull the image
+# Pull the Alpine image (default)
 docker pull wait4x/wait4x:latest
 
 # Run the container
 docker run --rm wait4x/wait4x:latest --help
 ```
+
+**Debian - Better compatibility (~80-100 MB):**
+
+```bash
+# Pull the Debian variant
+docker pull wait4x/wait4x:debian
+
+# Run the container
+docker run --rm wait4x/wait4x:debian --help
+```
+
+**Image Variant Tags:**
+
+- Alpine: `latest`, `3.2.0`, `3.2`, `3`, `edge`
+- Debian: `debian`, `3.2.0-debian`, `3.2-debian`, `3-debian`, `edge-debian`
+
+Choose Alpine for minimal size, or Debian for broader compatibility with legacy systems.
 </details>
 
 <details>
