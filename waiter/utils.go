@@ -22,8 +22,15 @@ import (
 
 // exponentialBackoff calculates the exponential backoff duration
 func exponentialBackoff(retries int, backoffCoefficient float64, initialInterval, maxInterval time.Duration) time.Duration {
-	interval := initialInterval * time.Duration(math.Pow(backoffCoefficient, float64(retries)))
-	if interval > maxInterval {
+	multiplier := math.Pow(backoffCoefficient, float64(retries))
+
+	// Handle overflow: if multiplier is infinity or too large, return maxInterval
+	if math.IsInf(multiplier, 1) || multiplier > float64(maxInterval)/float64(initialInterval) {
+		return maxInterval
+	}
+
+	interval := initialInterval * time.Duration(multiplier)
+	if interval > maxInterval || interval <= 0 {
 		return maxInterval
 	}
 	return interval

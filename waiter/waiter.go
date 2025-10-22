@@ -178,6 +178,21 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 		return fmt.Errorf("invalid backoff policy: %s", options.backoffPolicy)
 	}
 
+	// Validate exponential backoff parameters
+	if options.backoffPolicy == BackoffPolicyExponential {
+		if options.backoffCoefficient <= 1.0 {
+			return fmt.Errorf("backoff coefficient must be greater than 1.0, got: %f", options.backoffCoefficient)
+		}
+		if options.backoffExponentialMaxInterval < options.interval {
+			return fmt.Errorf("backoff exponential max interval (%v) must be greater than or equal to interval (%v)", options.backoffExponentialMaxInterval, options.interval)
+		}
+	}
+
+	// Validate interval is positive
+	if options.interval <= 0 {
+		return fmt.Errorf("interval must be positive, got: %v", options.interval)
+	}
+
 	// Ignore timeout context when the timeout is unlimited
 	if options.timeout != 0 {
 		var cancel func()

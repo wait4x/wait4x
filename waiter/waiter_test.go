@@ -209,3 +209,210 @@ func TestWaitLinearBackoff(t *testing.T) {
 	assert.Less(t, elapsed, 300*time.Millisecond)
 	mockChecker.AssertExpectations(t)
 }
+
+// TestWaitInvalidBackoffCoefficient tests the Waiter with an invalid backoff coefficient.
+func TestWaitInvalidBackoffCoefficient(t *testing.T) {
+	tests := []struct {
+		name        string
+		coefficient float64
+		wantError   string
+	}{
+		{
+			name:        "coefficient less than 1",
+			coefficient: 0.5,
+			wantError:   "backoff coefficient must be greater than 1.0, got: 0.500000",
+		},
+		{
+			name:        "coefficient equal to 1",
+			coefficient: 1.0,
+			wantError:   "backoff coefficient must be greater than 1.0, got: 1.000000",
+		},
+		{
+			name:        "coefficient zero",
+			coefficient: 0.0,
+			wantError:   "backoff coefficient must be greater than 1.0, got: 0.000000",
+		},
+		{
+			name:        "negative coefficient",
+			coefficient: -2.0,
+			wantError:   "backoff coefficient must be greater than 1.0, got: -2.000000",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockChecker := new(checker.MockChecker)
+
+			err := Wait(
+				mockChecker,
+				WithBackoffPolicy(BackoffPolicyExponential),
+				WithBackoffCoefficient(tt.coefficient),
+			)
+
+			assert.EqualError(t, err, tt.wantError)
+		})
+	}
+}
+
+// TestWaitInvalidMaxInterval tests the Waiter with an invalid max interval.
+func TestWaitInvalidMaxInterval(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+
+	err := Wait(
+		mockChecker,
+		WithBackoffPolicy(BackoffPolicyExponential),
+		WithInterval(time.Second),
+		WithBackoffExponentialMaxInterval(500*time.Millisecond),
+	)
+
+	assert.EqualError(t, err, "backoff exponential max interval (500ms) must be greater than or equal to interval (1s)")
+}
+
+// TestWaitInvalidInterval tests the Waiter with an invalid interval.
+func TestWaitInvalidInterval(t *testing.T) {
+	tests := []struct {
+		name      string
+		interval  time.Duration
+		wantError string
+	}{
+		{
+			name:      "zero interval",
+			interval:  0,
+			wantError: "interval must be positive, got: 0s",
+		},
+		{
+			name:      "negative interval",
+			interval:  -1 * time.Second,
+			wantError: "interval must be positive, got: -1s",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockChecker := new(checker.MockChecker)
+
+			err := Wait(mockChecker, WithInterval(tt.interval))
+
+			assert.EqualError(t, err, tt.wantError)
+		})
+	}
+}
+
+// TestWaitExponentialBackoffMaxInterval tests that exponential backoff respects max interval.
+func TestWaitExponentialBackoffMaxInterval(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+	mockChecker.On("Identity").Return("ID", nil)
+	mockChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).Times(5)
+	mockChecker.On("Check", mock.Anything).Return(nil).Once()
+
+	start := time.Now()
+	err := Wait(
+		mockChecker,
+		WithBackoffPolicy(BackoffPolicyExponential),
+		WithInterval(50*time.Millisecond),
+		WithBackoffCoefficient(2.0),
+		WithBackoffExponentialMaxInterval(150*time.Millisecond),
+		WithTimeout(10*time.Second),
+	)
+	elapsed := time.Since(start)
+
+	assert.Nil(t, err)
+	// First check: immediate (error)
+	// Second check: after 50ms (2^0 * 50ms = 50ms) (error)
+	// Third check: after 100ms (2^1 * 50ms = 100ms) (error)
+	// Fourth check: after 150ms (2^2 * 50ms = 200ms, capped at 150ms) (error)
+	// Fifth check: after 150ms (capped) (error)
+	// Sixth check: after 150ms (capped) (success)
+	// Total should be around 600ms
+	assert.Greater(t, elapsed, 550*time.Millisecond)
+	assert.Less(t, elapsed, 850*time.Millisecond)
+	mockChecker.AssertExpectations(t)
+}
+
+// TestWaitWithUnlimitedTimeout tests the Waiter with unlimited timeout (0 duration).
+func TestWaitWithUnlimitedTimeout(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+	mockChecker.On("Identity").Return("ID", nil)
+	mockChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).Times(2)
+	mockChecker.On("Check", mock.Anything).Return(nil).Once()
+
+	err := Wait(
+		mockChecker,
+		WithTimeout(0), // Unlimited timeout
+		WithInterval(50*time.Millisecond),
+	)
+
+	assert.Nil(t, err)
+	mockChecker.AssertExpectations(t)
+}
+
+// TestWaitParallelWithDifferentOptions tests parallel waiter with different configurations.
+func TestWaitParallelWithDifferentOptions(t *testing.T) {
+	// Test that options are applied correctly to each checker independently
+	fastChecker := new(checker.MockChecker)
+	fastChecker.On("Check", mock.Anything).Return(nil).
+		On("Identity").Return("FastChecker", nil)
+
+	slowChecker := new(checker.MockChecker)
+	slowChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).Times(2)
+	slowChecker.On("Check", mock.Anything).Return(nil).Once()
+	slowChecker.On("Identity").Return("SlowChecker", nil)
+
+	err := WaitParallel(
+		[]checker.Checker{fastChecker, slowChecker},
+		WithTimeout(5*time.Second),
+		WithInterval(100*time.Millisecond),
+	)
+
+	assert.Nil(t, err)
+	fastChecker.AssertExpectations(t)
+	slowChecker.AssertExpectations(t)
+}
+
+// TestWaitContextCancellation tests the Waiter with context cancellation.
+func TestWaitContextCancellation(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+	mockChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).
+		On("Identity").Return("ID", nil)
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Cancel the context after 100ms
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		cancel()
+	}()
+
+	err := WaitContext(ctx, mockChecker, WithInterval(50*time.Millisecond))
+
+	assert.Equal(t, context.Canceled, err)
+	mockChecker.AssertExpectations(t)
+}
+
+// TestWaitExponentialBackoffWithLargeCoefficient tests exponential backoff with large coefficient.
+func TestWaitExponentialBackoffWithLargeCoefficient(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+	mockChecker.On("Identity").Return("ID", nil)
+	mockChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).Times(2)
+	mockChecker.On("Check", mock.Anything).Return(nil).Once()
+
+	start := time.Now()
+	err := Wait(
+		mockChecker,
+		WithBackoffPolicy(BackoffPolicyExponential),
+		WithInterval(10*time.Millisecond),
+		WithBackoffCoefficient(10.0),
+		WithBackoffExponentialMaxInterval(time.Second),
+		WithTimeout(5*time.Second),
+	)
+	elapsed := time.Since(start)
+
+	assert.Nil(t, err)
+	// First check: immediate (error)
+	// Second check: after 10ms (10^0 * 10ms = 10ms) (error)
+	// Third check: after 100ms (10^1 * 10ms = 100ms) (success)
+	// Total should be around 110ms, but allow for scheduling overhead
+	assert.Greater(t, elapsed, 100*time.Millisecond)
+	assert.Less(t, elapsed, 2*time.Second)
+	mockChecker.AssertExpectations(t)
+}
