@@ -44,8 +44,18 @@ RUN --mount=from=binary,target=/build \
 FROM scratch AS artifact
 COPY --from=releaser /out /
 
-FROM alpine:3.22
+ARG BASE_VARIANT=alpine
+ARG ALPINE_VERSION=3.22
+ARG DEBIAN_VERSION=bookworm-slim
+
+FROM alpine:${ALPINE_VERSION} AS runtime-alpine
 RUN apk add --update --no-cache ca-certificates tzdata
+
+FROM debian:${DEBIAN_VERSION} AS runtime-debian
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM runtime-${BASE_VARIANT} AS runtime
 
 COPY --from=binary /wait4x /usr/bin/wait4x
 
