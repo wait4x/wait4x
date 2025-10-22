@@ -110,7 +110,8 @@ func WaitParallel(checkers []checker.Checker, opts ...Option) error {
 // WaitParallelContext waits for end up all of checks execution.
 func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts ...Option) error {
 	// Make channels to pass wgErrors in WaitGroup
-	wgErrors := make(chan error)
+	// Use buffered channel to prevent blocking when error occurs
+	wgErrors := make(chan error, len(checkers))
 	wgDone := make(chan bool)
 
 	var wg sync.WaitGroup
@@ -123,7 +124,12 @@ func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts .
 
 			err := WaitContext(ctx, chr, opts...)
 			if err != nil {
-				wgErrors <- err
+				// Non-blocking send to prevent goroutine leak
+				select {
+				case wgErrors <- err:
+				default:
+					// Another error was already received, ignore this one
+				}
 			}
 		}(chr)
 	}
@@ -139,8 +145,8 @@ func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts .
 	case <-wgDone:
 		return nil
 	case err := <-wgErrors:
-		close(wgErrors)
-
+		// Don't close the channel here to avoid race condition
+		// It will be garbage collected when the function returns
 		return err
 	}
 }
@@ -213,7 +219,7 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 			return fmt.Errorf("invalid backoff policy: %s", options.backoffPolicy)
 		}
 
-		if options.invertCheck == true {
+		if options.invertCheck {
 			if err == nil {
 				goto CONTINUE
 			}
@@ -227,10 +233,12 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 
 	CONTINUE:
 		retries++
+		timer := time.NewTimer(waitDuration)
 		select {
 		case <-ctx.Done():
+			timer.Stop()
 			return ctx.Err()
-		case <-time.After(waitDuration):
+		case <-timer.C:
 		}
 
 	}
