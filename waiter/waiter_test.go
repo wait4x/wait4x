@@ -145,3 +145,67 @@ func TestWaitParallelFail(t *testing.T) {
 	alwaysTrueSecond.AssertExpectations(t)
 	alwaysError.AssertExpectations(t)
 }
+
+// TestWaitInvalidBackoffPolicy tests the Waiter with an invalid backoff policy.
+func TestWaitInvalidBackoffPolicy(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+	// Note: Identity() is not called because validation happens first
+
+	err := Wait(mockChecker, WithBackoffPolicy("invalid-policy"))
+
+	assert.EqualError(t, err, "invalid backoff policy: invalid-policy")
+}
+
+// TestWaitExponentialBackoff tests the Waiter with exponential backoff policy.
+func TestWaitExponentialBackoff(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+	mockChecker.On("Identity").Return("ID", nil)
+	mockChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).Times(2)
+	mockChecker.On("Check", mock.Anything).Return(nil).Once()
+
+	start := time.Now()
+	err := Wait(
+		mockChecker,
+		WithBackoffPolicy(BackoffPolicyExponential),
+		WithInterval(100*time.Millisecond),
+		WithBackoffCoefficient(2.0),
+		WithBackoffExponentialMaxInterval(500*time.Millisecond),
+		WithTimeout(5*time.Second),
+	)
+	elapsed := time.Since(start)
+
+	assert.Nil(t, err)
+	// First check: immediate (error)
+	// Second check: after 100ms (2^0 * 100ms) (error)
+	// Third check: after 200ms (2^1 * 100ms) (success)
+	// Total should be around 300ms, allowing overhead
+	assert.Greater(t, elapsed, 250*time.Millisecond)
+	assert.Less(t, elapsed, 800*time.Millisecond)
+	mockChecker.AssertExpectations(t)
+}
+
+// TestWaitLinearBackoff tests the Waiter with linear backoff policy.
+func TestWaitLinearBackoff(t *testing.T) {
+	mockChecker := new(checker.MockChecker)
+	mockChecker.On("Identity").Return("ID", nil)
+	mockChecker.On("Check", mock.Anything).Return(fmt.Errorf("error")).Times(2)
+	mockChecker.On("Check", mock.Anything).Return(nil).Once()
+
+	start := time.Now()
+	err := Wait(
+		mockChecker,
+		WithBackoffPolicy(BackoffPolicyLinear),
+		WithInterval(100*time.Millisecond),
+		WithTimeout(5*time.Second),
+	)
+	elapsed := time.Since(start)
+
+	assert.Nil(t, err)
+	// First check: immediate (error)
+	// Second check: after 100ms (error)
+	// Third check: after 100ms (success)
+	// Total should be around 200ms
+	assert.Greater(t, elapsed, 180*time.Millisecond)
+	assert.Less(t, elapsed, 300*time.Millisecond)
+	mockChecker.AssertExpectations(t)
+}

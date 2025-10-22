@@ -173,6 +173,11 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 		opt(options)
 	}
 
+	// Validate backoff policy once outside the loop
+	if options.backoffPolicy != BackoffPolicyLinear && options.backoffPolicy != BackoffPolicyExponential {
+		return fmt.Errorf("invalid backoff policy: %s", options.backoffPolicy)
+	}
+
 	// Ignore timeout context when the timeout is unlimited
 	if options.timeout != 0 {
 		var cancel func()
@@ -192,7 +197,9 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 		return err
 	}
 
-	//This is a counter for exponential backoff
+	// This is a counter for exponential backoff
+	// Maximum value to prevent overflow in exponential calculations
+	const maxRetries = 1000000
 	retries := 0
 
 	for {
@@ -210,29 +217,27 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 			}
 		}
 
+		// Check if we should stop based on the check result
+		// For normal checks: stop when err is nil (success)
+		// For inverted checks: stop when err is not nil (failure is success)
+		shouldStop := (err == nil && !options.invertCheck) || (err != nil && options.invertCheck)
+		if shouldStop {
+			break
+		}
+
+		// Increment retry counter with bounds checking
+		if retries < maxRetries {
+			retries++
+		}
+
+		// Calculate wait duration based on backoff policy
 		var waitDuration time.Duration
 		if options.backoffPolicy == BackoffPolicyExponential {
 			waitDuration = exponentialBackoff(retries, options.backoffCoefficient, options.interval, options.backoffExponentialMaxInterval)
-		} else if options.backoffPolicy == BackoffPolicyLinear {
-			waitDuration = options.interval
 		} else {
-			return fmt.Errorf("invalid backoff policy: %s", options.backoffPolicy)
+			waitDuration = options.interval
 		}
 
-		if options.invertCheck {
-			if err == nil {
-				goto CONTINUE
-			}
-
-			break
-		}
-
-		if err == nil {
-			break
-		}
-
-	CONTINUE:
-		retries++
 		timer := time.NewTimer(waitDuration)
 		select {
 		case <-ctx.Done():
@@ -240,7 +245,6 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 			return ctx.Err()
 		case <-timer.C:
 		}
-
 	}
 
 	return nil
