@@ -16,22 +16,30 @@
 package waiter
 
 import (
+	"fmt"
 	"math"
 	"time"
 )
 
 // exponentialBackoff calculates the exponential backoff duration
-func exponentialBackoff(retries int, backoffCoefficient float64, initialInterval, maxInterval time.Duration) time.Duration {
+func exponentialBackoff(retries int, backoffCoefficient float64, initialInterval, maxInterval time.Duration) (time.Duration, error) {
 	multiplier := math.Pow(backoffCoefficient, float64(retries))
 
 	// Handle overflow: if multiplier is infinity or too large, return maxInterval
 	if math.IsInf(multiplier, 1) || multiplier > float64(maxInterval)/float64(initialInterval) {
-		return maxInterval
+		return maxInterval, nil
 	}
 
 	interval := initialInterval * time.Duration(multiplier)
-	if interval > maxInterval || interval <= 0 {
-		return maxInterval
+
+	// This should never happen with validated inputs; if it does, it's a bug
+	if interval <= 0 {
+		return 0, fmt.Errorf("calculated interval is invalid (%v): initialInterval=%v, multiplier=%v, retries=%d",
+			interval, initialInterval, multiplier, retries)
 	}
-	return interval
+
+	if interval > maxInterval {
+		return maxInterval, nil
+	}
+	return interval, nil
 }

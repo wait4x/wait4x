@@ -84,7 +84,8 @@ func TestExponentialBackoff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := exponentialBackoff(tt.retries, tt.backoffCoefficient, tt.initialInterval, tt.maxInterval)
+			result, err := exponentialBackoff(tt.retries, tt.backoffCoefficient, tt.initialInterval, tt.maxInterval)
+			assert.NoError(t, err)
 			assert.Equal(t, tt.expectedDuration, result)
 		})
 	}
@@ -136,7 +137,8 @@ func TestExponentialBackoffEdgeCases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := exponentialBackoff(tt.retries, tt.backoffCoefficient, tt.initialInterval, tt.maxInterval)
+			result, err := exponentialBackoff(tt.retries, tt.backoffCoefficient, tt.initialInterval, tt.maxInterval)
+			assert.NoError(t, err)
 
 			// Verify result is within bounds
 			assert.GreaterOrEqual(t, result, tt.initialInterval, "result should be >= initialInterval")
@@ -157,7 +159,8 @@ func TestExponentialBackoffConsistency(t *testing.T) {
 	var previousDuration time.Duration
 
 	for retries := 0; retries < 20; retries++ {
-		currentDuration := exponentialBackoff(retries, coefficient, initialInterval, maxInterval)
+		currentDuration, err := exponentialBackoff(retries, coefficient, initialInterval, maxInterval)
+		assert.NoError(t, err, "exponentialBackoff should not return error at retry %d", retries)
 
 		// Verify duration is positive
 		assert.Greater(t, currentDuration, time.Duration(0), "duration should be positive at retry %d", retries)

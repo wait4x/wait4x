@@ -112,6 +112,7 @@ func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts .
 	// Make channels to pass wgErrors in WaitGroup
 	// Use buffered channel to prevent blocking when error occurs
 	wgErrors := make(chan error, len(checkers))
+	defer close(wgErrors) // Always close when function returns
 	wgDone := make(chan bool)
 
 	var wg sync.WaitGroup
@@ -145,8 +146,6 @@ func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts .
 	case <-wgDone:
 		return nil
 	case err := <-wgErrors:
-		// Don't close the channel here to avoid race condition
-		// It will be garbage collected when the function returns
 		return err
 	}
 }
@@ -201,7 +200,7 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 	}
 
 	var chkName string
-	if t := reflect.TypeOf(chk); t.Kind() == reflect.Ptr {
+	if t := reflect.TypeOf(chk); t.Kind() == reflect.Pointer {
 		chkName = t.Elem().Name()
 	} else {
 		chkName = t.Name()
@@ -248,7 +247,11 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 		// Calculate wait duration based on backoff policy
 		var waitDuration time.Duration
 		if options.backoffPolicy == BackoffPolicyExponential {
-			waitDuration = exponentialBackoff(retries, options.backoffCoefficient, options.interval, options.backoffExponentialMaxInterval)
+			var err error
+			waitDuration, err = exponentialBackoff(retries, options.backoffCoefficient, options.interval, options.backoffExponentialMaxInterval)
+			if err != nil {
+				return fmt.Errorf("exponential backoff calculation error: %w", err)
+			}
 		} else {
 			waitDuration = options.interval
 		}
