@@ -1,4 +1,10 @@
 # syntax=docker/dockerfile:1.5.1
+
+# Global ARGs used in FROM directives
+ARG BASE_VARIANT=alpine
+ARG ALPINE_VERSION=3.22
+ARG DEBIAN_VERSION=bookworm-slim
+
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
 
 FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
@@ -40,10 +46,6 @@ RUN --mount=from=binary,target=/build \
   # Note: This will be removed in v4.0.0. Please use the SHA256SUMS file going forward.
   && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" > "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz.sha256sum" \
   && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" >> "SHA256SUMS"
-
-ARG BASE_VARIANT=alpine
-ARG ALPINE_VERSION=3.22
-ARG DEBIAN_VERSION=bookworm-slim
 
 FROM scratch AS artifact
 COPY --from=releaser /out /
