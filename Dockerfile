@@ -41,12 +41,12 @@ RUN --mount=from=binary,target=/build \
   && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" > "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz.sha256sum" \
   && sha256sum "wait4x-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}.tar.gz" >> "SHA256SUMS"
 
-FROM scratch AS artifact
-COPY --from=releaser /out /
-
 ARG BASE_VARIANT=alpine
 ARG ALPINE_VERSION=3.22
 ARG DEBIAN_VERSION=bookworm-slim
+
+FROM scratch AS artifact
+COPY --from=releaser /out /
 
 FROM alpine:${ALPINE_VERSION} AS runtime-alpine
 RUN apk add --update --no-cache ca-certificates tzdata
