@@ -154,7 +154,7 @@ jobs:
         with:
           buildkitd-config-inline: |
             [worker.oci]
-              max-parallelism = 10
+              max-parallelism = 15
 
       - name: Login to Docker Hub (docker.io)
         if: ${{ github.event_name != 'pull_request' }}
