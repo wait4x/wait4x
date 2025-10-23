@@ -106,7 +106,7 @@ func (s *PostgreSQLSuite) TestExpectTable() {
 	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
-	_, _, err = s.container.Exec(ctx, []string{"psql", `postgresql://postgres:postgres@localhost:5432/postgres`, "-c", "CREATE TABLE my_table (id INT)"})
+	_, _, err = s.container.Exec(ctx, []string{"psql", endpoint + "sslmode=disable", "-c", "CREATE TABLE my_table (id INT)"})
 	s.Require().NoError(err)
 
 	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))

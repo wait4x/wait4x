@@ -40,7 +40,7 @@ func (s *MySQLSuite) SetupSuite() {
 		context.Background(),
 		"mysql:8.0.36",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
-		testcontainers.WithWaitStrategy(wait.ForListeningPort("3306/tcp")),
+		testcontainers.WithWaitStrategy(wait.ForLog("port: 3306  MySQL Community Server")),
 	)
 
 	s.Require().NoError(err)
