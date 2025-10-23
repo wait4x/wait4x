@@ -24,7 +24,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // PostgreSQLSuite is a test suite for PostgreSQL checker

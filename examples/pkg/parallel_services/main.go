@@ -22,11 +22,11 @@ import (
 	"time"
 
 	"github.com/go-logr/stdr"
-	"wait4x.dev/v3/checker"
-	"wait4x.dev/v3/checker/http"
-	"wait4x.dev/v3/checker/postgresql"
-	"wait4x.dev/v3/checker/redis"
-	"wait4x.dev/v3/waiter"
+	"wait4x.dev/v4/checker"
+	"wait4x.dev/v4/checker/http"
+	"wait4x.dev/v4/checker/postgresql"
+	"wait4x.dev/v4/checker/redis"
+	"wait4x.dev/v4/waiter"
 )
 
 // main is the main function for the Parallel Services example

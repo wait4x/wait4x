@@ -32,7 +32,7 @@ import (
 	"github.com/antchfx/htmlquery"
 	"github.com/tidwall/gjson"
 	"golang.org/x/net/http2"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // Option configures an HTTP.

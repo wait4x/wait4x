@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // TCPSuite is a test suite for TCP checker
