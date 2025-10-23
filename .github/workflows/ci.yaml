@@ -88,7 +88,6 @@ jobs:
           # Maintaining "atkrad/wait4x" for backward compatibility
           # Note: This will be removed in v4.0.0. Please use the "wait4x/wait4x" image going forward.
           images: | 
-            atkrad/wait4x
             wait4x/wait4x
             ghcr.io/${{ github.repository }}
           ### versioning strategy
@@ -119,7 +118,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: | 
-            atkrad/wait4x
             wait4x/wait4x
             ghcr.io/${{ github.repository }}
           flavor: |
