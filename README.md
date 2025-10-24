@@ -406,6 +406,45 @@ Check readiness for popular databases.
 > **Notes:**
 > - The connection string format is: kafka://[user:pass@]host:port[?option=value&...]
 > - Supported options: authMechanism (scram-sha-256, scram-sha-512)
+
+---
+
+### gRPC Health Check
+
+Check gRPC server health using the standard [gRPC Health Checking Protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
+
+- **Basic health check (overall server):**
+
+  ```bash
+  wait4x grpc localhost:50051 --insecure-transport
+  ```
+
+- **Check specific service:**
+
+  ```bash
+  wait4x grpc localhost:50051 --service myapp.UserService --insecure-transport
+  ```
+
+- **With TLS:**
+
+  ```bash
+  wait4x grpc api.example.com:443
+  ```
+
+- **Skip TLS verification (for self-signed certs):**
+
+  ```bash
+  wait4x grpc localhost:50051 --insecure-skip-tls-verify
+  ```
+
+- **With custom timeout:**
+
+  ```bash
+  wait4x grpc localhost:50051 --timeout 10s --insecure-transport
+  ```
+
+> **Note:** Your gRPC server must implement the `grpc.health.v1.Health` service for health checking to work.
+
 ---
 
 ### Shell Command
@@ -682,6 +721,7 @@ wait4x <command> --help
 | ------------ | ------------------------------------------------- |
 | `tcp`        | Wait for a TCP port to become available           |
 | `http`       | Wait for an HTTP(S) endpoint with advanced checks |
+| `grpc`       | Wait for a gRPC server health check               |
 | `dns`        | Wait for DNS records (A, AAAA, CNAME, MX, etc.)   |
 | `kafka`      | Wait for Kafka server                             |
 | `mysql`      | Wait for a MySQL database to be ready             |
