@@ -85,10 +85,10 @@ func (s *PostgreSQLSuite) TestInvalidConnection() {
 func (s *PostgreSQLSuite) TestValidAddress() {
 	ctx := context.Background()
 
-	endpoint, err := s.container.ConnectionString(ctx)
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	chk := New(endpoint + "sslmode=disable")
+	chk := New(endpoint)
 	s.Assert().Nil(chk.Check(ctx))
 }
 
@@ -97,10 +97,10 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 
 	ctx := context.Background()
 
-	endpoint, err := s.container.ConnectionString(ctx)
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithExpectTable("not_existing_table"))
+	chk := New(endpoint, WithExpectTable("not_existing_table"))
 
 	s.Assert().ErrorAs(chk.Check(ctx), &expectedError)
 }
@@ -118,10 +118,10 @@ func (s *PostgreSQLSuite) TestExpectTable() {
 	})
 	s.Require().NoError(err)
 
-	endpoint, err := s.container.ConnectionString(ctx)
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))
+	chk := New(endpoint, WithExpectTable("my_table"))
 	s.Assert().Nil(chk.Check(ctx))
 }
 
