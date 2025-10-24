@@ -39,8 +39,8 @@ jobs:
         go install github.com/mgechev/revive@v1.1.4
         make check-revive
 
-  test:
-    name: Test
+  test-unit:
+    name: Unit Tests
     needs: check
     runs-on: ubuntu-latest
     steps:
@@ -52,16 +52,79 @@ jobs:
       with:
         go-version: 1.24.x
 
-    - name: Test Wait4X
+    - name: Run Unit Tests
       run: make test
+
+    - name: Upload unit coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-unit
+        path: coverage.out
+        retention-days: 1
+
+  test-integration:
+    name: Integration Tests
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v5
+
+    - name: Set up Go 1.24.x
+      uses: actions/setup-go@v6
+      with:
+        go-version: 1.24.x
+
+    - name: Run Integration Tests
+      run: make test-integration
+
+    - name: Upload integration coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-integration
+        path: coverage-integration.out
+        retention-days: 1
+
+  coverage:
+    name: Coverage Report
+    needs: [test-unit, test-integration]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v5
+
+    - name: Set up Go 1.24.x
+      uses: actions/setup-go@v6
+      with:
+        go-version: 1.24.x
+
+    - name: Download unit coverage
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage-unit
+        path: ./coverage-unit
+
+    - name: Download integration coverage
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage-integration
+        path: ./coverage-integration
+
+    - name: Install gocovmerge
+      run: go install github.com/wadey/gocovmerge@latest
+
+    - name: Merge coverage reports
+      run: |
+        gocovmerge ./coverage-unit/coverage.out ./coverage-integration/coverage-integration.out > coverage-merged.out
+        echo "Merged coverage report created"
 
     - name: Convert coverage to lcov
       uses: jandelgado/gcov2lcov-action@v1.2.0
       with:
-        infile: coverage.out
+        infile: coverage-merged.out
         outfile: coverage.lcov
 
-    - name: Coveralls
+    - name: Upload to Coveralls
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -69,7 +132,7 @@ jobs:
 
   build:
     name: Build
-    needs: test
+    needs: [test-unit, test-integration]
     runs-on: ubuntu-latest
     permissions:
       contents: write

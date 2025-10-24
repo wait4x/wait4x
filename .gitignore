@@ -2,6 +2,12 @@ bin
 dist
 vendor
 coverage.out
+coverage-integration.out
+coverage-all.out
+coverage-merged.out
+coverage.html
+coverage-integration.html
+coverage-all.html
 
 # Nix build results
 result
