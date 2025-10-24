@@ -72,7 +72,8 @@ func (s *PostgreSQLSuite) TestInvalidIdentity() {
 // TestValidConnection tests the valid connection of the PostgreSQL server
 func (s *PostgreSQLSuite) TestInvalidConnection() {
 	var expectedError *checker.ExpectedError
-	chk := New("postgres://bob:secret@1.2.3.4:5432/mydb?sslmode=verify-full")
+	// Use localhost:8080 to get immediate connection refused (matches MySQL test pattern)
+	chk := New("postgres://bob:secret@localhost:8080/mydb?sslmode=disable")
 
 	s.Assert().ErrorAs(chk.Check(context.Background()), &expectedError)
 }
