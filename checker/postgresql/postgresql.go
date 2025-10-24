@@ -22,7 +22,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 
 	// Needed for the PostgreSQL driver
 	_ "github.com/lib/pq"

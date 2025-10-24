@@ -19,18 +19,18 @@ These examples demonstrate how to use Wait4X as an importable package in your Go
 To use Wait4X in your Go project, add it as a dependency:
 
 ```bash
-go get wait4x.dev/v3
+go get wait4x.dev/v4
 ```
 
 Then import the packages you need:
 
 ```go
 import (
-    "wait4x.dev/v3/checker/tcp"      // TCP checker
-    "wait4x.dev/v3/checker/http"     // HTTP checker
-    "wait4x.dev/v3/checker/redis"    // Redis checker
+    "wait4x.dev/v4/checker/tcp"      // TCP checker
+    "wait4x.dev/v4/checker/http"     // HTTP checker
+    "wait4x.dev/v4/checker/redis"    // Redis checker
     // ...other checkers
-    "wait4x.dev/v3/waiter"           // Waiter functionality
+    "wait4x.dev/v4/waiter"           // Waiter functionality
 )
 ```
 
@@ -78,6 +78,6 @@ See `custom_checker.go` for a complete example of implementing a custom checker.
 
 ## Additional Resources
 
-- Go Reference Documentation: https://pkg.go.dev/wait4x.dev/v3
+- Go Reference Documentation: https://pkg.go.dev/wait4x.dev/v4
 - GitHub Repository: https://github.com/wait4x/wait4x
 - Report Issues: https://github.com/wait4x/wait4x/issues
