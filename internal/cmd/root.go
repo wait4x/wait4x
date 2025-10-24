@@ -30,10 +30,10 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 
-	"wait4x.dev/v3/internal/cmd/dns"
-	"wait4x.dev/v3/internal/cmd/temporal"
-	"wait4x.dev/v3/internal/contextutil"
-	"wait4x.dev/v3/waiter"
+	"wait4x.dev/v4/internal/cmd/dns"
+	"wait4x.dev/v4/internal/cmd/temporal"
+	"wait4x.dev/v4/internal/contextutil"
+	"wait4x.dev/v4/waiter"
 )
 
 const (
@@ -164,8 +164,6 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.PersistentFlags().Float64("backoff-exponential-coefficient", 2.0, "Coefficient used to calculate the exponential backoff when backoff-policy is exponential.")
 	rootCmd.PersistentFlags().DurationP("timeout", "t", 10*time.Second, "Timeout is the maximum amount of time that Wait4X will wait for a checking operation, 0 is unlimited.")
 	rootCmd.PersistentFlags().BoolP("invert-check", "v", false, "Invert the sense of checking.")
-	rootCmd.PersistentFlags().StringP("log-level", "l", zerolog.InfoLevel.String(), "Set the logging level (\"trace\"|\"debug\"|\"info\")")
-	rootCmd.PersistentFlags().MarkDeprecated("log-level", "You don't need to the flag anymore. By default, Wait4X returns error logs. This flag will be removed in v4.0.0")
 	rootCmd.PersistentFlags().Bool("no-color", false, "If specified, output won't contain any color.")
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Quiet or silent mode. Do not show logs or error messages.")
 

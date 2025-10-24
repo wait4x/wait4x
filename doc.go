@@ -23,4 +23,4 @@
 //   - Support for multiple protocols and service types
 //
 // For more information and examples, visit: https://wait4x.dev
-package wait4x // import "wait4x.dev/v3"
+package wait4x // import "wait4x.dev/v4"

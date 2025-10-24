@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // Constants representing the available backoff policies for retry mechanisms
@@ -110,7 +110,9 @@ func WaitParallel(checkers []checker.Checker, opts ...Option) error {
 // WaitParallelContext waits for end up all of checks execution.
 func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts ...Option) error {
 	// Make channels to pass wgErrors in WaitGroup
-	wgErrors := make(chan error)
+	// Use buffered channel to prevent blocking when error occurs
+	wgErrors := make(chan error, len(checkers))
+	defer close(wgErrors) // Always close when function returns
 	wgDone := make(chan bool)
 
 	var wg sync.WaitGroup
@@ -123,7 +125,12 @@ func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts .
 
 			err := WaitContext(ctx, chr, opts...)
 			if err != nil {
-				wgErrors <- err
+				// Non-blocking send to prevent goroutine leak
+				select {
+				case wgErrors <- err:
+				default:
+					// Another error was already received, ignore this one
+				}
 			}
 		}(chr)
 	}
@@ -139,8 +146,6 @@ func WaitParallelContext(ctx context.Context, checkers []checker.Checker, opts .
 	case <-wgDone:
 		return nil
 	case err := <-wgErrors:
-		close(wgErrors)
-
 		return err
 	}
 }
@@ -167,6 +172,26 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 		opt(options)
 	}
 
+	// Validate backoff policy once outside the loop
+	if options.backoffPolicy != BackoffPolicyLinear && options.backoffPolicy != BackoffPolicyExponential {
+		return fmt.Errorf("invalid backoff policy: %s", options.backoffPolicy)
+	}
+
+	// Validate exponential backoff parameters
+	if options.backoffPolicy == BackoffPolicyExponential {
+		if options.backoffCoefficient <= 1.0 {
+			return fmt.Errorf("backoff coefficient must be greater than 1.0, got: %f", options.backoffCoefficient)
+		}
+		if options.backoffExponentialMaxInterval < options.interval {
+			return fmt.Errorf("backoff exponential max interval (%v) must be greater than or equal to interval (%v)", options.backoffExponentialMaxInterval, options.interval)
+		}
+	}
+
+	// Validate interval is positive
+	if options.interval <= 0 {
+		return fmt.Errorf("interval must be positive, got: %v", options.interval)
+	}
+
 	// Ignore timeout context when the timeout is unlimited
 	if options.timeout != 0 {
 		var cancel func()
@@ -175,7 +200,7 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 	}
 
 	var chkName string
-	if t := reflect.TypeOf(chk); t.Kind() == reflect.Ptr {
+	if t := reflect.TypeOf(chk); t.Kind() == reflect.Pointer {
 		chkName = t.Elem().Name()
 	} else {
 		chkName = t.Name()
@@ -186,7 +211,9 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 		return err
 	}
 
-	//This is a counter for exponential backoff
+	// This is a counter for exponential backoff
+	// Maximum value to prevent overflow in exponential calculations
+	const maxRetries = 1000000
 	retries := 0
 
 	for {
@@ -204,35 +231,38 @@ func WaitContext(ctx context.Context, chk checker.Checker, opts ...Option) error
 			}
 		}
 
+		// Check if we should stop based on the check result
+		// For normal checks: stop when err is nil (success)
+		// For inverted checks: stop when err is not nil (failure is success)
+		shouldStop := (err == nil && !options.invertCheck) || (err != nil && options.invertCheck)
+		if shouldStop {
+			break
+		}
+
+		// Increment retry counter with bounds checking
+		if retries < maxRetries {
+			retries++
+		}
+
+		// Calculate wait duration based on backoff policy
 		var waitDuration time.Duration
 		if options.backoffPolicy == BackoffPolicyExponential {
-			waitDuration = exponentialBackoff(retries, options.backoffCoefficient, options.interval, options.backoffExponentialMaxInterval)
-		} else if options.backoffPolicy == BackoffPolicyLinear {
-			waitDuration = options.interval
-		} else {
-			return fmt.Errorf("invalid backoff policy: %s", options.backoffPolicy)
-		}
-
-		if options.invertCheck == true {
-			if err == nil {
-				goto CONTINUE
+			var err error
+			waitDuration, err = exponentialBackoff(retries, options.backoffCoefficient, options.interval, options.backoffExponentialMaxInterval)
+			if err != nil {
+				return fmt.Errorf("exponential backoff calculation error: %w", err)
 			}
-
-			break
+		} else {
+			waitDuration = options.interval
 		}
 
-		if err == nil {
-			break
-		}
-
-	CONTINUE:
-		retries++
+		timer := time.NewTimer(waitDuration)
 		select {
 		case <-ctx.Done():
+			timer.Stop()
 			return ctx.Err()
-		case <-time.After(waitDuration):
+		case <-timer.C:
 		}
-
 	}
 
 	return nil
