@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 // TestHttpInvalidAddress tests the HTTP checker with an invalid address.
 func TestHttpInvalidAddress(t *testing.T) {
 	hc := New("http://not-exists.tld", WithTimeout(time.Second))
-	assert.Error(t, hc.Check(context.TODO()))
+	assert.Error(t, hc.Check(context.Background()))
 }
 
 // TestHttpValidAddress tests the HTTP checker with a valid address.
@@ -54,7 +54,7 @@ func TestHttpValidAddress(t *testing.T) {
 	identity, err := hc.Identity()
 
 	assert.Nil(t, err)
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 	assert.Equal(t, ts.URL, identity)
 }
 
@@ -68,7 +68,7 @@ func TestHttpInvalidStatusCode(t *testing.T) {
 	hc := New(ts.URL, WithExpectStatusCode(http.StatusCreated))
 
 	var expectedError *checker.ExpectedError
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 }
 
 // TestHttpValidStatusCode tests the HTTP checker with a valid status code.
@@ -80,13 +80,13 @@ func TestHttpValidStatusCode(t *testing.T) {
 
 	hc := New(ts.URL, WithExpectStatusCode(http.StatusOK))
 
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpInvalidTLS tests the HTTP checker with an invalid TLS certificate.
 func TestHttpInvalidTLS(t *testing.T) {
 	hc := New("https://expired.badssl.com", WithInsecureSkipTLSVerify(true))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 func TestHttpH2CEnabled_Succeeds(t *testing.T) {
@@ -103,7 +103,7 @@ func TestHttpH2CEnabled_Succeeds(t *testing.T) {
 	defer srv.Close()
 
 	hc := New(srv.URL, WithTimeout(2*time.Second), WithNoRedirect(true), WithH2C(true), WithExpectStatusCode(http.StatusOK))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpNoRedirect tests the HTTP checker with no redirect.
@@ -116,7 +116,7 @@ func TestHttpNoRedirect(t *testing.T) {
 	defer ts.Close()
 	hc := New(ts.URL, WithExpectStatusCode(http.StatusTemporaryRedirect), WithNoRedirect(true))
 
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpRedirect tests the HTTP checker with a redirect.
@@ -129,7 +129,7 @@ func TestHttpRedirect(t *testing.T) {
 	defer ts.Close()
 	hc := New(ts.URL, WithExpectStatusCode(http.StatusOK))
 
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpInvalidBody tests the HTTP checker with an invalid body.
@@ -143,7 +143,7 @@ func TestHttpInvalidBody(t *testing.T) {
 	hc := New(ts.URL, WithExpectBodyRegex("FooBar"))
 
 	var expectedError *checker.ExpectedError
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 }
 
 // TestHttpValidBody tests the HTTP checker with a valid body.
@@ -156,7 +156,7 @@ func TestHttpValidBody(t *testing.T) {
 
 	hc := New(ts.URL, WithExpectBodyRegex("Wait4X.+best.+tools"))
 
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpValidBodyJSON tests the HTTP checker with a valid body JSON.
@@ -168,13 +168,13 @@ func TestHttpValidBodyJSON(t *testing.T) {
 	defer ts.Close()
 
 	hc := New(ts.URL, WithExpectBodyJSON("user"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	hc = New(ts.URL, WithExpectBodyJSON("user.name"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	hc = New(ts.URL, WithExpectBodyJSON("is_active"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpInvalidBodyJSON tests the HTTP checker with an invalid body JSON.
@@ -188,7 +188,7 @@ func TestHttpInvalidBodyJSON(t *testing.T) {
 	hc := New(ts.URL, WithExpectBodyJSON("test"))
 
 	var expectedError *checker.ExpectedError
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 }
 
 // TestHttpInvalidBodyXPath tests the HTTP checker with an invalid body XPath.
@@ -202,10 +202,10 @@ func TestHttpInvalidBodyXPath(t *testing.T) {
 	var expectedError *checker.ExpectedError
 
 	hc := New(ts.URL, WithExpectBodyXPath("//hello"))
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 
 	hc = New(ts.URL, WithExpectBodyXPath("//code[@id='test']"))
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 }
 
 // TestHttpValidBodyXPath tests the HTTP checker with a valid body XPath.
@@ -217,10 +217,10 @@ func TestHttpValidBodyXPath(t *testing.T) {
 	defer ts.Close()
 
 	hc := New(ts.URL, WithExpectBodyXPath("//div/code"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	hc = New(ts.URL, WithExpectBodyXPath("//code[@id='ip']"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpValidHeader tests the HTTP checker with a valid header.
@@ -234,24 +234,24 @@ func TestHttpValidHeader(t *testing.T) {
 	defer ts.Close()
 
 	hc := New(ts.URL, WithExpectHeader("Test-Header"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	hc = New(ts.URL, WithExpectHeader("X-Foo"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	hc = New(ts.URL, WithExpectHeader("X-Foo=.*"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	// Regex.
 	hc = New(ts.URL, WithExpectHeader("Test-Header=test-.+"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	hc = New(ts.URL, WithExpectHeader("Authorization=^Token\\s.+"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 
 	// Key value.
 	hc = New(ts.URL, WithExpectHeader("Test-Header=test-value"))
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpInvalidHeader tests the HTTP checker with an invalid header.
@@ -264,13 +264,13 @@ func TestHttpInvalidHeader(t *testing.T) {
 	defer ts.Close()
 
 	hc := New(ts.URL, WithExpectHeader("Test-Header-New"))
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 
 	hc = New(ts.URL, WithExpectHeader("Test-.+=test-value"))
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 
 	hc = New(ts.URL, WithExpectHeader("Test-Header=[A-Z]"))
-	assert.ErrorAs(t, hc.Check(context.TODO()), &expectedError)
+	assert.ErrorAs(t, hc.Check(context.Background()), &expectedError)
 }
 
 // TestHttpRequestHeaders tests the HTTP checker with request headers.
@@ -291,7 +291,7 @@ func TestHttpRequestHeaders(t *testing.T) {
 		WithRequestHeader("Foo", []string{"test1 test2"}),
 		WithExpectBodyRegex("(.*Authorization=\\[Token 123\\].*Foo=\\[test1 test2\\].*)|(.*Foo=\\[test1 test2\\].*Authorization=\\[Token 123\\].*)"),
 	)
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
 
 // TestHttpInvalidCombinationFeatures tests the HTTP checker with invalid combination features.
@@ -306,17 +306,17 @@ func TestHttpInvalidCombinationFeatures(t *testing.T) {
 	defer ts.Close()
 
 	hc := New(ts.URL, WithExpectStatusCode(http.StatusCreated), WithExpectBodyRegex("FooBar"))
-	err := hc.Check(context.TODO())
+	err := hc.Check(context.Background())
 	assert.ErrorAs(t, err, &expectedError)
 	assert.Equal(t, "the body doesn't expect", err.Error())
 
 	hc = New(ts.URL, WithExpectStatusCode(http.StatusCreated), WithExpectBodyRegex("Wait4X"), WithExpectHeader("X-Foo"))
-	err = hc.Check(context.TODO())
+	err = hc.Check(context.Background())
 	assert.ErrorAs(t, err, &expectedError)
 	assert.Equal(t, "the http header key doesn't expect", err.Error())
 
 	hc = New(ts.URL, WithExpectStatusCode(http.StatusOK), WithExpectBodyRegex("Wait4X"), WithExpectHeader("Test-Header"))
-	err = hc.Check(context.TODO())
+	err = hc.Check(context.Background())
 	assert.ErrorAs(t, err, &expectedError)
 	assert.Equal(t, "the status code doesn't expect", err.Error())
 }
@@ -337,14 +337,14 @@ func TestHttpRequestBody(t *testing.T) {
 		ts.URL,
 		WithRequestBody(strings.NewReader("name=test&score=1")), WithExpectBodyRegex("something"),
 	)
-	err := hc.Check(context.TODO())
+	err := hc.Check(context.Background())
 	assert.ErrorAs(t, err, &expectedError)
 
 	hc = New(
 		ts.URL,
 		WithRequestBody(strings.NewReader("name=test&score=1")), WithExpectBodyRegex("name=test&score=1"),
 	)
-	err = hc.Check(context.TODO())
+	err = hc.Check(context.Background())
 	assert.Nil(t, err)
 }
 
@@ -364,5 +364,5 @@ func TestHttpRequestHeaderWithoutInit(t *testing.T) {
 		WithRequestHeader("Foo", []string{"Bar"}),
 		WithExpectBodyRegex("Foo=\\[Bar\\]"),
 	)
-	assert.Nil(t, hc.Check(context.TODO()))
+	assert.Nil(t, hc.Check(context.Background()))
 }
