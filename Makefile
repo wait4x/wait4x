@@ -77,7 +77,7 @@ WAIT4X_FLAGS ?=
 check_cmd = $(shell command -v $(1) 2> /dev/null)
 
 # Filter coverage output to exclude ignored packages
-filter_coverage = @grep $(foreach pkg,$(WAIT4X_COVERAGE_IGNORE_PACKAGES),-v -e "$(pkg)") coverage.out.tmp > coverage.out
+filter_coverage = grep $(foreach pkg,$(WAIT4X_COVERAGE_IGNORE_PACKAGES),-v -e "$(pkg)")
 
 # Common build function
 define build_binary
@@ -151,7 +151,7 @@ check-deps: ## Check for outdated dependencies
 test: ## Run unit tests with coverage (excludes integration tests)
 	@echo "Running unit tests..."
 	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -covermode=atomic -coverprofile=coverage.out.tmp ./...
-	@$(filter_coverage) > coverage.out
+	@$(filter_coverage) < coverage.out.tmp > coverage.out
 	@rm coverage.out.tmp
 	@echo "Test coverage report generated: coverage.out"
 
@@ -159,7 +159,7 @@ test: ## Run unit tests with coverage (excludes integration tests)
 test-short: ## Run tests without race detection and integration tests
 	@echo "Running tests (short mode)..."
 	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -short -covermode=atomic -coverprofile=coverage.out.tmp ./...
-	@$(filter_coverage) > coverage.out
+	@$(filter_coverage) < coverage.out.tmp > coverage.out
 	@rm coverage.out.tmp
 
 .PHONY: test-integration
@@ -184,7 +184,7 @@ test-all: ## Run all tests (unit + integration)
 test-coverage: ## Run unit tests and show coverage report
 	@echo "Running unit tests with coverage..."
 	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -covermode=atomic -coverprofile=coverage.out.tmp ./...
-	@$(filter_coverage) > coverage.out
+	@$(filter_coverage) < coverage.out.tmp > coverage.out
 	@rm coverage.out.tmp
 	@echo "Coverage report:"
 	$(GO_ENVIRONMENTS) $(GO_BINARY) tool cover -func=coverage.out
