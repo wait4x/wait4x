@@ -21,8 +21,8 @@ import (
 	"log"
 	"time"
 
-	"wait4x.dev/v3/checker/tcp"
-	"wait4x.dev/v3/waiter"
+	"wait4x.dev/v4/checker/tcp"
+	"wait4x.dev/v4/waiter"
 )
 
 // main is the main function for the TCP Basic example

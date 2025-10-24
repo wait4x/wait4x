@@ -24,7 +24,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // PostgreSQLSuite is a test suite for PostgreSQL checker
@@ -72,7 +72,8 @@ func (s *PostgreSQLSuite) TestInvalidIdentity() {
 // TestValidConnection tests the valid connection of the PostgreSQL server
 func (s *PostgreSQLSuite) TestInvalidConnection() {
 	var expectedError *checker.ExpectedError
-	chk := New("postgres://bob:secret@1.2.3.4:5432/mydb?sslmode=verify-full")
+	// Use localhost:8080 to get immediate connection refused (matches MySQL test pattern)
+	chk := New("postgres://bob:secret@localhost:8080/mydb?sslmode=disable")
 
 	s.Assert().ErrorAs(chk.Check(context.Background()), &expectedError)
 }
@@ -103,10 +104,18 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 
 func (s *PostgreSQLSuite) TestExpectTable() {
 	ctx := context.Background()
-	endpoint, err := s.container.ConnectionString(ctx)
+
+	// Create table using psql command with proper parameters
+	// The default postgres container has user=postgres, database=postgres
+	_, _, err := s.container.Exec(ctx, []string{
+		"psql",
+		"-U", "postgres",
+		"-d", "postgres",
+		"-c", "CREATE TABLE my_table (id INT)",
+	})
 	s.Require().NoError(err)
 
-	_, _, err = s.container.Exec(ctx, []string{"psql", `postgresql://postgres:postgres@localhost:5432/postgres`, "-c", "CREATE TABLE my_table (id INT)"})
+	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
 	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))

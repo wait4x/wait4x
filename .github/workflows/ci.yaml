@@ -23,10 +23,10 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v5
 
-    - name: Set up Go 1.23.x
-      uses: actions/setup-go@v5
+    - name: Set up Go 1.24.x
+      uses: actions/setup-go@v6
       with:
-        go-version: 1.23.x
+        go-version: 1.24.x
 
     - name: go-fmt
       run: make check-gofmt
@@ -47,10 +47,10 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v5
 
-    - name: Set up Go 1.23.x
-      uses: actions/setup-go@v5
+    - name: Set up Go 1.24.x
+      uses: actions/setup-go@v6
       with:
-        go-version: 1.23.x
+        go-version: 1.24.x
 
     - name: Test Wait4X
       run: make test
@@ -81,25 +81,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Docker metadata
-        id: meta
+      - name: Docker metadata (Alpine)
+        id: meta-alpine
         uses: docker/metadata-action@v5
         with:
           # Maintaining "atkrad/wait4x" for backward compatibility
           # Note: This will be removed in v4.0.0. Please use the "wait4x/wait4x" image going forward.
           images: | 
-            atkrad/wait4x
             wait4x/wait4x
             ghcr.io/${{ github.repository }}
           ### versioning strategy
           ### push semver tag v3.2.1 on the default branch
-          # wait4x/wait4x:2.2.0
-          # wait4x/wait4x:2.2
-          # wait4x/wait4x:2
+          # wait4x/wait4x:3.2.0
+          # wait4x/wait4x:3.2
+          # wait4x/wait4x:3
           # wait4x/wait4x:latest
-          # ghcr.io/wait4x/wait4x:2.2.0
-          # ghcr.io/wait4x/wait4x:2.2
-          # ghcr.io/wait4x/wait4x:2
+          # ghcr.io/wait4x/wait4x:3.2.0
+          # ghcr.io/wait4x/wait4x:3.2
+          # ghcr.io/wait4x/wait4x:3
           # ghcr.io/wait4x/wait4x:latest
           ### push semver pre-release tag v3.0.0-beta.1 on the default branch
           # wait4x/wait4x:3.0.0-beta.1
@@ -114,12 +113,46 @@ jobs:
             type=ref,event=pr
             type=edge,branch=${{ github.event.repository.default_branch }}
 
+      - name: Docker metadata (Debian)
+        id: meta-debian
+        uses: docker/metadata-action@v5
+        with:
+          images: | 
+            wait4x/wait4x
+            ghcr.io/${{ github.repository }}
+          flavor: |
+            suffix=-debian,onlatest=false
+          ### versioning strategy
+          ### push semver tag v3.2.1 on the default branch
+          # wait4x/wait4x:debian
+          # wait4x/wait4x:3.2.0-debian
+          # wait4x/wait4x:3.2-debian
+          # wait4x/wait4x:3-debian
+          # ghcr.io/wait4x/wait4x:debian
+          # ghcr.io/wait4x/wait4x:3.2.0-debian
+          # ghcr.io/wait4x/wait4x:3.2-debian
+          # ghcr.io/wait4x/wait4x:3-debian
+          ### push semver pre-release tag v3.0.0-beta.1 on the default branch
+          # wait4x/wait4x:3.0.0-beta.1-debian
+          # ghcr.io/wait4x/wait4x:3.0.0-beta.1-debian
+          ### push on the default branch
+          # wait4x/wait4x:edge-debian
+          # ghcr.io/wait4x/wait4x:edge-debian
+          tags: |
+            type=raw,value=debian,enable={{is_default_branch}}
+            type=raw,value=debian,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=pr
+            type=edge,branch=${{ github.event.repository.default_branch }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           buildkitd-config-inline: |
             [worker.oci]
-              max-parallelism = 10
+              max-parallelism = 15
 
       - name: Login to Docker Hub (docker.io)
         if: ${{ github.event_name != 'pull_request' }}
@@ -162,19 +195,36 @@ jobs:
           path: ./dist/*
           if-no-files-found: error
 
-      - name: Build images
+      - name: Build and push Alpine image
         uses: docker/bake-action@v6
         with:
-          targets: image
+          targets: image-alpine
           push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
           sbom: true
           provenance: true
           files: |
             ./docker-bake.hcl
-            cwd://${{ steps.meta.outputs.bake-file }}
+            cwd://${{ steps.meta-alpine.outputs.bake-file }}
+          set: |
+            *.args.COMMIT_HASH=${{ github.sha }}
+            *.args.COMMIT_REF_SLUG=${{ github.ref_name }}
+
+      - name: Build and push Debian image
+        uses: docker/bake-action@v6
+        with:
+          targets: image-debian
+          push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
+          sbom: true
+          provenance: true
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.meta-debian.outputs.bake-file }}
+          set: |
+            *.args.COMMIT_HASH=${{ github.sha }}
+            *.args.COMMIT_REF_SLUG=${{ github.ref_name }}
 
       - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v4
+        uses: peter-evans/dockerhub-description@v5
         if: ${{ github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}

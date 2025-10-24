@@ -5,11 +5,11 @@
 
   <a href="https://github.com/wait4x/wait4x/actions/workflows/ci.yaml"><img src="https://img.shields.io/github/actions/workflow/status/wait4x/wait4x/ci.yaml?branch=main&style=flat-square" alt="CI Status"></a>
   <a href="https://coveralls.io/github/wait4x/wait4x?branch=main"><img src="https://img.shields.io/coverallsCoverage/github/wait4x/wait4x?branch=main&style=flat-square" alt="Coverage"></a>
-  <a href="https://goreportcard.com/report/wait4x.dev/v3"><img src="https://goreportcard.com/badge/wait4x.dev/v3?style=flat-square" alt="Go Report"></a>
+  <a href="https://goreportcard.com/report/wait4x.dev/v4"><img src="https://goreportcard.com/badge/wait4x.dev/v4?style=flat-square" alt="Go Report"></a>
   <a href="https://hub.docker.com/r/wait4x/wait4x"><img src="https://img.shields.io/docker/pulls/wait4x/wait4x?logo=docker&style=flat-square" alt="Docker Pulls"></a>
   <a href="https://github.com/wait4x/wait4x/releases"><img src="https://img.shields.io/github/downloads/wait4x/wait4x/total?logo=github&style=flat-square" alt="Downloads"></a>
   <a href="https://repology.org/project/wait4x/versions"><img src="https://img.shields.io/repology/repositories/wait4x?style=flat-square" alt="Packaging"></a>
-  <a href="https://pkg.go.dev/wait4x.dev/v3"><img src="https://img.shields.io/badge/reference-007D9C.svg?style=flat-square&logo=go&logoColor=white&labelColor=5C5C5C" alt="Go Reference"></a>
+  <a href="https://pkg.go.dev/wait4x.dev/v4"><img src="https://img.shields.io/badge/reference-007D9C.svg?style=flat-square&logo=go&logoColor=white&labelColor=5C5C5C" alt="Go Reference"></a>
 </div>
 
 ---
@@ -57,15 +57,34 @@
 <details>
 <summary><b>🐳 With Docker</b></summary>
 
-Wait4X provides automatically updated Docker images within Docker Hub:
+Wait4X provides automatically updated Docker images within Docker Hub in two variants:
+
+**Alpine (default) - Minimal size (~10-15 MB):**
 
 ```bash
-# Pull the image
+# Pull the Alpine image (default)
 docker pull wait4x/wait4x:latest
 
 # Run the container
 docker run --rm wait4x/wait4x:latest --help
 ```
+
+**Debian - Better compatibility (~80-100 MB):**
+
+```bash
+# Pull the Debian variant
+docker pull wait4x/wait4x:debian
+
+# Run the container
+docker run --rm wait4x/wait4x:debian --help
+```
+
+**Image Variant Tags:**
+
+- Alpine: `latest`, `3.2.0`, `3.2`, `3`, `edge`
+- Debian: `debian`, `3.2.0-debian`, `3.2-debian`, `3-debian`, `edge-debian`
+
+Choose Alpine for minimal size, or Debian for broader compatibility with legacy systems.
 </details>
 
 <details>
@@ -138,7 +157,7 @@ sha256sum --check wait4x-linux-amd64.tar.gz.sha256sum
 You can install Wait4X directly from source using Go (requires Go 1.16+):
 
 ```bash
-go install wait4x.dev/v3/cmd/wait4x@latest
+go install wait4x.dev/v4/cmd/wait4x@latest
 ```
 
 This will place the `wait4x` binary in your `$GOPATH/bin` or `$HOME/go/bin` directory.
@@ -504,7 +523,7 @@ See [CLI Reference](#cli-reference) for all available flags and options.
 Add Wait4X to your Go project:
 
 ```bash
-go get wait4x.dev/v3
+go get wait4x.dev/v4
 ```
 
 Import the packages you need:
@@ -514,10 +533,10 @@ import (
     "context"
     "time"
 
-    "wait4x.dev/v3/checker/tcp"      // TCP checker
-    "wait4x.dev/v3/checker/http"     // HTTP checker
-    "wait4x.dev/v3/checker/redis"    // Redis checker
-    "wait4x.dev/v3/waiter"           // Waiter functionality
+    "wait4x.dev/v4/checker/tcp"      // TCP checker
+    "wait4x.dev/v4/checker/http"     // HTTP checker
+    "wait4x.dev/v4/checker/redis"    // Redis checker
+    "wait4x.dev/v4/waiter"           // Waiter functionality
 )
 ```
 </details>

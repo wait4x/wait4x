@@ -25,7 +25,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	redismodule "github.com/testcontainers/testcontainers-go/modules/redis"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // RedisSuite is a test suite for Redis checker

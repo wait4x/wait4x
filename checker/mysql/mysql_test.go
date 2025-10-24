@@ -24,7 +24,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // MySQLSuite is a test suite for MySQL checker
@@ -40,7 +40,7 @@ func (s *MySQLSuite) SetupSuite() {
 		context.Background(),
 		"mysql:8.0.36",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
-		testcontainers.WithWaitStrategy(wait.ForListeningPort("33060")),
+		testcontainers.WithWaitStrategy(wait.ForLog("port: 3306  MySQL Community Server")),
 	)
 
 	s.Require().NoError(err)

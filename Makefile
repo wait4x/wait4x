@@ -23,7 +23,7 @@ GO_VERSION ?= $(shell $(GO_BINARY) version | cut -d' ' -f3 | sed 's/go//')
 
 # Wait4X configuration
 WAIT4X_BINARY_NAME ?= wait4x
-WAIT4X_MODULE_NAME ?= wait4x.dev/v3
+WAIT4X_MODULE_NAME ?= wait4x.dev/v4
 WAIT4X_MAIN_PATH ?= cmd/wait4x/main.go
 
 # Test configuration
