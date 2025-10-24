@@ -103,10 +103,18 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 
 func (s *PostgreSQLSuite) TestExpectTable() {
 	ctx := context.Background()
-	endpoint, err := s.container.ConnectionString(ctx)
+
+	// Create table using psql command with proper parameters
+	// The default postgres container has user=postgres, database=postgres
+	_, _, err := s.container.Exec(ctx, []string{
+		"psql",
+		"-U", "postgres",
+		"-d", "postgres",
+		"-c", "CREATE TABLE my_table (id INT)",
+	})
 	s.Require().NoError(err)
 
-	_, _, err = s.container.Exec(ctx, []string{"psql", endpoint + "sslmode=disable", "-c", "CREATE TABLE my_table (id INT)"})
+	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
 	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))
