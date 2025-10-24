@@ -5,9 +5,9 @@ ARG BASE_VARIANT=alpine
 ARG ALPINE_VERSION=3.22
 ARG DEBIAN_VERSION=bookworm-slim
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.8.0 AS xx
 
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine3.22 AS base
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=0
 
