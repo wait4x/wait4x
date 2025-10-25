@@ -8,11 +8,13 @@ These examples demonstrate how to use Wait4X as an importable package in your Go
 
 2. **Advanced HTTP Checker** (`http_advanced/main.go`): Demonstrates complex HTTP checking with custom headers, body validations, status code checks, and more.
 
-3. **Parallel Service Checking** (`parallel_services/main.go`): Shows how to check multiple services in parallel, waiting for all of them to be ready before proceeding.
+3. **gRPC Health Check** (`grpc_health/main.go`): Shows how to check gRPC server health using the standard health checking protocol.
 
-4. **Reverse Checking** (`reverse_checking/main.go`): Example of using the inverse check to wait for a port to become free.
+4. **Parallel Service Checking** (`parallel_services/main.go`): Shows how to check multiple services in parallel, waiting for all of them to be ready before proceeding.
 
-5. **Custom Checker** (`custom_checker/main.go`): Shows how to create your own custom checker by implementing the Checker interface.
+5. **Reverse Checking** (`reverse_checking/main.go`): Example of using the inverse check to wait for a port to become free.
+
+6. **Custom Checker** (`custom_checker/main.go`): Shows how to create your own custom checker by implementing the Checker interface.
 
 ## Using Wait4X in Your Go Projects
 
@@ -28,6 +30,7 @@ Then import the packages you need:
 import (
     "wait4x.dev/v4/checker/tcp"      // TCP checker
     "wait4x.dev/v4/checker/http"     // HTTP checker
+    "wait4x.dev/v4/checker/grpc"     // gRPC health checker
     "wait4x.dev/v4/checker/redis"    // Redis checker
     // ...other checkers
     "wait4x.dev/v4/waiter"           // Waiter functionality
