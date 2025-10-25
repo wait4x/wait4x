@@ -31,7 +31,7 @@ import (
 var hidePasswordRegexp = regexp.MustCompile(`^(postgres://[^/:]+):[^:@]+@`)
 
 const (
-	expectTableQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s')"
+	expectTableQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = current_schema() AND table_name = $1)"
 )
 
 // Option is a function that configures the PostgreSQL checker
@@ -101,9 +101,8 @@ func (p *PostgreSQL) Check(ctx context.Context) (err error) {
 
 	// check if the table exists if option has been set
 	if p.expectTable != "" {
-		query := fmt.Sprintf(expectTableQuery, p.expectTable)
 		var exists bool
-		err = db.QueryRowContext(ctx, query).Scan(&exists)
+		err = db.QueryRowContext(ctx, expectTableQuery, p.expectTable).Scan(&exists)
 		if err != nil {
 			return err
 		}
