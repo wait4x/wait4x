@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // server is the server to use for the tests

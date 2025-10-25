@@ -24,7 +24,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/suite"
-	"wait4x.dev/v3/internal/test"
+	"wait4x.dev/v4/internal/test"
 )
 
 // TCPCommandSuite is a test suite for TCP command functionality

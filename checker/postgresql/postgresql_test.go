@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 // Copyright 2019-2025 The Wait4X Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +21,14 @@ package postgresql
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // PostgreSQLSuite is a test suite for PostgreSQL checker
@@ -40,7 +44,10 @@ func (s *PostgreSQLSuite) SetupSuite() {
 		context.Background(),
 		"postgres:16-alpine",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
-		testcontainers.WithWaitStrategy(wait.ForListeningPort("5432")),
+		testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2).
+				WithStartupTimeout(60*time.Second)),
 	)
 
 	s.Require().NoError(err)
@@ -72,7 +79,8 @@ func (s *PostgreSQLSuite) TestInvalidIdentity() {
 // TestValidConnection tests the valid connection of the PostgreSQL server
 func (s *PostgreSQLSuite) TestInvalidConnection() {
 	var expectedError *checker.ExpectedError
-	chk := New("postgres://bob:secret@1.2.3.4:5432/mydb?sslmode=verify-full")
+	// Use localhost:8080 to get immediate connection refused (matches MySQL test pattern)
+	chk := New("postgres://bob:secret@localhost:8080/mydb?sslmode=disable")
 
 	s.Assert().ErrorAs(chk.Check(context.Background()), &expectedError)
 }
@@ -81,10 +89,10 @@ func (s *PostgreSQLSuite) TestInvalidConnection() {
 func (s *PostgreSQLSuite) TestValidAddress() {
 	ctx := context.Background()
 
-	endpoint, err := s.container.ConnectionString(ctx)
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	chk := New(endpoint + "sslmode=disable")
+	chk := New(endpoint)
 	s.Assert().Nil(chk.Check(ctx))
 }
 
@@ -93,23 +101,31 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 
 	ctx := context.Background()
 
-	endpoint, err := s.container.ConnectionString(ctx)
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithExpectTable("not_existing_table"))
+	chk := New(endpoint, WithExpectTable("not_existing_table"))
 
 	s.Assert().ErrorAs(chk.Check(ctx), &expectedError)
 }
 
 func (s *PostgreSQLSuite) TestExpectTable() {
 	ctx := context.Background()
-	endpoint, err := s.container.ConnectionString(ctx)
+
+	// Create table using psql command with proper parameters
+	// The default postgres container has user=postgres, database=postgres
+	_, _, err := s.container.Exec(ctx, []string{
+		"psql",
+		"-U", "postgres",
+		"-d", "postgres",
+		"-c", "CREATE TABLE my_table (id INT)",
+	})
 	s.Require().NoError(err)
 
-	_, _, err = s.container.Exec(ctx, []string{"psql", `postgresql://postgres:postgres@localhost:5432/postgres`, "-c", "CREATE TABLE my_table (id INT)"})
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))
+	chk := New(endpoint, WithExpectTable("my_table"))
 	s.Assert().Nil(chk.Check(ctx))
 }
 

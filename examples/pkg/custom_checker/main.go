@@ -23,8 +23,8 @@ import (
 	"os"
 	"time"
 
-	"wait4x.dev/v3/checker"
-	"wait4x.dev/v3/waiter"
+	"wait4x.dev/v4/checker"
+	"wait4x.dev/v4/waiter"
 )
 
 // FileChecker checks if a file exists and meets criteria

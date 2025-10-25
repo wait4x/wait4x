@@ -16,7 +16,7 @@
 package main
 
 import (
-	"wait4x.dev/v3/internal/cmd"
+	"wait4x.dev/v4/internal/cmd"
 )
 
 // main is the main function for the Wait4X application

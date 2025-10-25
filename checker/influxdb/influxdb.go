@@ -17,8 +17,9 @@ package influxdb
 
 import (
 	"context"
+
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // InfluxDB is an InfluxDB checker

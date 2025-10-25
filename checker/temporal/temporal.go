@@ -31,7 +31,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // Option configures a Temporal checker

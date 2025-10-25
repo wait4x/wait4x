@@ -22,13 +22,13 @@ import (
 	"regexp"
 
 	"github.com/go-sql-driver/mysql"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 var hidePasswordRegexp = regexp.MustCompile(`^([^:]+):[^:@]+@`)
 
 const (
-	expectTableQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s')"
+	expectTableQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?)"
 )
 
 // MySQL is a MySQL checker
@@ -98,9 +98,8 @@ func (m *MySQL) Check(ctx context.Context) (err error) {
 
 	// check if the table exists if option has been set
 	if m.expectTable != "" {
-		query := fmt.Sprintf(expectTableQuery, m.expectTable)
 		var exists bool
-		err = db.QueryRowContext(ctx, query).Scan(&exists)
+		err = db.QueryRowContext(ctx, expectTableQuery, m.expectTable).Scan(&exists)
 		if err != nil {
 			return err
 		}
