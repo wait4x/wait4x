@@ -156,7 +156,7 @@ jobs:
           find ./dist -type d -empty -delete
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: wait4x-artifacts
           path: ./dist/*
