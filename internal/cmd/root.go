@@ -24,6 +24,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/charmbracelet/fang"
+	"github.com/charmbracelet/lipgloss/v2"
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zerologr"
@@ -191,7 +193,16 @@ func Execute() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	if err := rootCmd.ExecuteContext(ctx); err != nil {
+	// Create a custom fang option that checks the flag after parsing
+	fangOpt := fang.WithColorSchemeFunc(func(fn lipgloss.LightDarkFunc) fang.ColorScheme {
+		// Check if no-color flag is set after parsing
+		if noColor, _ := rootCmd.PersistentFlags().GetBool("no-color"); noColor {
+			return fang.ColorScheme{}
+		}
+		return fang.DefaultColorScheme(fn)
+	})
+
+	if err := fang.Execute(ctx, rootCmd, fangOpt); err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			os.Exit(ExitTimedOut)
 		}
