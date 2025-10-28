@@ -211,7 +211,7 @@ func (s *ContextUtilSuite) TestContextCompatibility() {
 
 // TestDefaultValues tests default values for all getters
 func (s *ContextUtilSuite) TestDefaultValues() {
-	ctx := context.TODO()
+	ctx := context.Background()
 
 	s.Equal(time.Duration(0), GetTimeout(ctx))
 	s.Equal(time.Duration(0), GetInterval(ctx))

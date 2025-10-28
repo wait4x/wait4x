@@ -24,10 +24,10 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 
-	"wait4x.dev/v3/checker"
-	"wait4x.dev/v3/checker/influxdb"
-	"wait4x.dev/v3/internal/contextutil"
-	"wait4x.dev/v3/waiter"
+	"wait4x.dev/v4/checker"
+	"wait4x.dev/v4/checker/influxdb"
+	"wait4x.dev/v4/internal/contextutil"
+	"wait4x.dev/v4/waiter"
 )
 
 // NewInfluxDBCommand creates a new influxdb sub-command

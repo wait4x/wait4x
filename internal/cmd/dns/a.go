@@ -21,10 +21,10 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
-	"wait4x.dev/v3/internal/contextutil"
+	"wait4x.dev/v4/internal/contextutil"
 
-	dns "wait4x.dev/v3/checker/dns/a"
-	"wait4x.dev/v3/waiter"
+	dns "wait4x.dev/v4/checker/dns/a"
+	"wait4x.dev/v4/waiter"
 )
 
 // NewACommand creates a new DNS A command

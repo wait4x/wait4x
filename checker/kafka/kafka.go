@@ -25,7 +25,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl"
 	"github.com/segmentio/kafka-go/sasl/scram"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 const (

@@ -23,7 +23,7 @@ GO_VERSION ?= $(shell $(GO_BINARY) version | cut -d' ' -f3 | sed 's/go//')
 
 # Wait4X configuration
 WAIT4X_BINARY_NAME ?= wait4x
-WAIT4X_MODULE_NAME ?= wait4x.dev/v3
+WAIT4X_MODULE_NAME ?= wait4x.dev/v4
 WAIT4X_MAIN_PATH ?= cmd/wait4x/main.go
 
 # Test configuration
@@ -77,7 +77,7 @@ WAIT4X_FLAGS ?=
 check_cmd = $(shell command -v $(1) 2> /dev/null)
 
 # Filter coverage output to exclude ignored packages
-filter_coverage = @grep $(foreach pkg,$(WAIT4X_COVERAGE_IGNORE_PACKAGES),-v -e "$(pkg)") coverage.out.tmp > coverage.out
+filter_coverage = grep $(foreach pkg,$(WAIT4X_COVERAGE_IGNORE_PACKAGES),-v -e "$(pkg)")
 
 # Common build function
 define build_binary
@@ -148,10 +148,10 @@ check-deps: ## Check for outdated dependencies
 	@$(GO_ENVIRONMENTS) $(GO_BINARY) list -u -m all | grep -v "go:" || echo "All dependencies are up to date"
 
 .PHONY: test
-test: ## Run tests with coverage
-	@echo "Running tests..."
+test: ## Run unit tests with coverage (excludes integration tests)
+	@echo "Running unit tests..."
 	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -covermode=atomic -coverprofile=coverage.out.tmp ./...
-	@$(filter_coverage) > coverage.out
+	@$(filter_coverage) < coverage.out.tmp > coverage.out
 	@rm coverage.out.tmp
 	@echo "Test coverage report generated: coverage.out"
 
@@ -159,14 +159,32 @@ test: ## Run tests with coverage
 test-short: ## Run tests without race detection and integration tests
 	@echo "Running tests (short mode)..."
 	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -short -covermode=atomic -coverprofile=coverage.out.tmp ./...
-	@$(filter_coverage) > coverage.out
+	@$(filter_coverage) < coverage.out.tmp > coverage.out
 	@rm coverage.out.tmp
 
+.PHONY: test-integration
+test-integration: ## Run integration tests (requires Docker)
+	@echo "Running integration tests..."
+	@echo "⚠️  Note: Integration tests require Docker to be running"
+	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -tags=integration -covermode=atomic -coverprofile=coverage-integration.out.tmp ./...
+	@$(filter_coverage) < coverage-integration.out.tmp > coverage-integration.out
+	@rm coverage-integration.out.tmp
+	@echo "Integration test coverage report generated: coverage-integration.out"
+
+.PHONY: test-all
+test-all: ## Run all tests (unit + integration)
+	@echo "Running all tests (unit + integration)..."
+	@echo "⚠️  Note: Integration tests require Docker to be running"
+	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -tags=integration -covermode=atomic -coverprofile=coverage-all.out.tmp ./...
+	@$(filter_coverage) < coverage-all.out.tmp > coverage-all.out
+	@rm coverage-all.out.tmp
+	@echo "Complete test coverage report generated: coverage-all.out"
+
 .PHONY: test-coverage
-test-coverage: ## Run tests and show coverage report
-	@echo "Running tests with coverage..."
+test-coverage: ## Run unit tests and show coverage report
+	@echo "Running unit tests with coverage..."
 	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -covermode=atomic -coverprofile=coverage.out.tmp ./...
-	@$(filter_coverage) > coverage.out
+	@$(filter_coverage) < coverage.out.tmp > coverage.out
 	@rm coverage.out.tmp
 	@echo "Coverage report:"
 	$(GO_ENVIRONMENTS) $(GO_BINARY) tool cover -func=coverage.out
@@ -174,6 +192,20 @@ test-coverage: ## Run tests and show coverage report
 	@echo "HTML coverage report:"
 	$(GO_ENVIRONMENTS) $(GO_BINARY) tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report saved to coverage.html"
+
+.PHONY: test-coverage-all
+test-coverage-all: ## Run all tests (unit + integration) and show coverage report
+	@echo "Running all tests with coverage..."
+	@echo "⚠️  Note: Integration tests require Docker to be running"
+	$(GO_ENVIRONMENTS) $(GO_BINARY) test -v -race -tags=integration -covermode=atomic -coverprofile=coverage-all.out.tmp ./...
+	@$(filter_coverage) < coverage-all.out.tmp > coverage-all.out
+	@rm coverage-all.out.tmp
+	@echo "Coverage report:"
+	$(GO_ENVIRONMENTS) $(GO_BINARY) tool cover -func=coverage-all.out
+	@echo ""
+	@echo "HTML coverage report:"
+	$(GO_ENVIRONMENTS) $(GO_BINARY) tool cover -html=coverage-all.out -o coverage-all.html
+	@echo "Coverage report saved to coverage-all.html"
 
 .PHONY: lint
 lint: ## Run all linting checks
@@ -295,8 +327,12 @@ release: clean deps lint test build-cross ## Prepare release (clean, lint, test,
 	@echo "✅ Release preparation complete!"
 
 .PHONY: ci
-ci: deps lint test ## Run CI pipeline
+ci: deps lint test ## Run CI pipeline (unit tests only)
 	@echo "✅ CI pipeline completed successfully!"
+
+.PHONY: ci-integration
+ci-integration: deps lint test-all ## Run full CI pipeline (unit + integration tests)
+	@echo "✅ Full CI pipeline completed successfully!"
 
 # =============================================================================
 # Development helpers
