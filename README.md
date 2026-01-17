@@ -201,6 +201,7 @@ Jump to:
 - [Database Checking](#database-checking)
 - [Message Queue Checking](#message-queue-checking)
 - [Shell Command](#shell-command)
+- [File Checking](#file-checking)
 
 ---
 
@@ -402,6 +403,40 @@ Wait for a shell command to succeed or return a specific exit code.
   wait4x exec 'ls target/debug/main' --exit-code 2
   ```
 
+---
+
+### File Checking
+
+Wait for a file to exist and optionally match certain conditions.
+
+- **Wait for a file to appear:**
+  ```bash
+  wait4x file /run/mail/daemon.lock
+  ```
+- **Wait for a file to disappear:**
+  ```bash
+  wait4x file /var/spool/cron.lock --invert-check
+  ```
+- **Wait for any file to appear:**
+  ```bash
+  wait4x file /dev/vdb /dev/vdc /dev/vdd --allow-any
+  ```
+- **Wait for a file content to match a regular expression:**
+  ```bash
+  wait4x file /run/observer/health.json --expect-content-regex healthy
+  ```
+- **Wait for a file to grow above a certain size:**
+  ```bash
+  wait4x file /mnt/backups/daily.tgz --expect-size 3M --invert-check
+  ```
+- **Wait for a file to be rotated (i.e. modification time is below a certain threshold):**
+  ```bash
+  wait4x file /var/log/server.log.1.gz --expect-age 5s
+  ```
+
+> **Notes:**
+> - File size is specified in bytes; valid suffixes include `K`, `M`, `G`, `T`, `P`, `E`, `Ki`, `Mi`, `Gi`, `Ti`, `Pi`, and `Ei`.
+> - File age is specified in seconds; valid suffixes include `ns`, `us`, `ms`, `s`, `m`, and `h`.
 ---
 
 See [Advanced Features](#advanced-features) for timeout, retry, backoff, and parallel/reverse checking options.

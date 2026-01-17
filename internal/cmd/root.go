@@ -188,6 +188,7 @@ func Execute() {
 	rootCmd.AddCommand(temporal.NewTemporalCommand())
 	rootCmd.AddCommand(NewVersionCommand())
 	rootCmd.AddCommand(NewExecCommand())
+	rootCmd.AddCommand(NewFileCommand())
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
