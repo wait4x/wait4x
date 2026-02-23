@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.5.1
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
 
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine3.23 AS base
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=0
 
@@ -44,10 +44,14 @@ RUN --mount=from=binary,target=/build \
 FROM scratch AS artifact
 COPY --from=releaser /out /
 
-FROM alpine:3.22
-RUN apk add --update --no-cache ca-certificates tzdata
+FROM alpine:3.23.3
+RUN apk add --update --no-cache ca-certificates tzdata && \
+    addgroup -g 1001 -S wait4x && \
+    adduser -S -s /bin/sh -G wait4x -u 10000 wait4x
 
 COPY --from=binary /wait4x /usr/bin/wait4x
+
+USER wait4x
 
 ENTRYPOINT ["wait4x"]
 CMD ["help"]
