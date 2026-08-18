@@ -46,17 +46,17 @@ func NewACommand() *cobra.Command {
   wait4x dns A wait4x.dev
 
   # Check A records with specific expected IPv4 addresses
-  wait4x dns A wait4x.dev --expect-ip 172.67.154.180
-  wait4x dns A wait4x.dev --expect-ip 172.67.154.180 --expect-ip 104.21.60.85
+  wait4x dns A one.one.one.one --expect-ip 1.1.1.1
+  wait4x dns A one.one.one.one --expect-ip 1.1.1.1 --expect-ip 1.0.0.1
 
   # Check A records using a custom nameserver
-  wait4x dns A wait4x.dev --expect-ip 172.67.154.180 -n gordon.ns.cloudflare.com
+  wait4x dns A one.one.one.one --expect-ip 1.1.1.1 -n 8.8.8.8
 
   # Check A records with timeout and interval settings
   wait4x dns A wait4x.dev --timeout 30s --interval 5s
 
   # Invert the check (wait until records don't match)
-  wait4x dns A wait4x.dev --expect-ip 172.67.154.180 --invert-check`,
+  wait4x dns A one.one.one.one --expect-ip 1.1.1.1 --invert-check`,
 		RunE: runA,
 	}
 

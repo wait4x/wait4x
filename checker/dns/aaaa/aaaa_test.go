@@ -23,7 +23,14 @@ import (
 	"wait4x.dev/v3/checker"
 )
 
-const server = "wait4x.dev"
+const (
+	server = "wait4x.dev"
+
+	// one.one.one.one is Cloudflare DNS. Its AAAA records are the product
+	// addresses and do not rotate like proxied website IPs.
+	stableHost = "one.one.one.one"
+	stableIPv6 = "2606:4700:4700::1111"
+)
 
 // TestSuite is a test suite for the AAAA DNS checker.
 type TestSuite struct {
@@ -40,7 +47,7 @@ func (s *TestSuite) TestCheckExistenceAAAA() {
 // TestCorrectAAAA tests that the AAAA DNS checker correctly checks for the
 // existence of the expected AAAA record for the given server.
 func (s *TestSuite) TestCorrectAAAA() {
-	d := New(server, WithExpectedIPV6s([]string{"2606:4700:3034::6815:591"}))
+	d := New(stableHost, WithExpectedIPV6s([]string{stableIPv6}))
 	s.Assert().Nil(d.Check(context.Background()))
 }
 
@@ -55,7 +62,7 @@ func (s *TestSuite) TestIncorrectAAAA() {
 // TestCustomNSCorrectAAAA tests that the AAAA DNS checker correctly checks for the
 // existence of the expected AAAA record for the given server using a custom name server.
 func (s *TestSuite) TestCustomNSCorrectAAAA() {
-	d := New(server, WithNameServer("8.8.8.8:53"), WithExpectedIPV6s([]string{"2606:4700:3034::6815:591"}))
+	d := New(stableHost, WithNameServer("8.8.8.8:53"), WithExpectedIPV6s([]string{stableIPv6}))
 	s.Assert().Nil(d.Check(context.Background()))
 }
 

@@ -1,4 +1,11 @@
 # syntax=docker/dockerfile:1.5.1
+
+# Global so later FROM lines can interpolate them. An ARG after COPY is
+# scoped to that stage, which made BASE_VARIANT empty and produced "runtime-".
+ARG BASE_VARIANT=alpine
+ARG ALPINE_VERSION=3.22
+ARG DEBIAN_VERSION=bookworm-slim
+
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
 
 FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
@@ -43,10 +50,6 @@ RUN --mount=from=binary,target=/build \
 
 FROM scratch AS artifact
 COPY --from=releaser /out /
-
-ARG BASE_VARIANT=alpine
-ARG ALPINE_VERSION=3.22
-ARG DEBIAN_VERSION=bookworm-slim
 
 FROM alpine:${ALPINE_VERSION} AS runtime-alpine
 RUN apk add --update --no-cache ca-certificates tzdata
