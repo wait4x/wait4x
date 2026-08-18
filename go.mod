@@ -30,6 +30,7 @@ require (
 	github.com/tonglil/buflogr v1.1.1
 	go.mongodb.org/mongo-driver v1.17.9
 	go.temporal.io/api v1.63.5
+	go.withmatt.com/size v0.0.0-20250220224316-11aee5773e67
 	google.golang.org/grpc v1.79.3
 	mvdan.cc/sh/v3 v3.13.1
 )

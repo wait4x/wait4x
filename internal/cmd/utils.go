@@ -15,6 +15,10 @@
 // Package cmd provides the command-line interface for the Wait4X application.
 package cmd
 
+import (
+	"go.withmatt.com/size"
+)
+
 func contains(s []string, str string) bool {
 	for _, v := range s {
 		if v == str {
@@ -24,3 +28,22 @@ func contains(s []string, str string) bool {
 
 	return false
 }
+
+type sizeValue uint64
+
+func newSizeValue(val uint64, p *uint64) *sizeValue {
+	*p = val
+	return (*sizeValue)(p)
+}
+
+func (s *sizeValue) Set(v string) error {
+	c, err := size.ParseCapacity(v)
+	*s = sizeValue(c.Bytes())
+	return err
+}
+
+func (s *sizeValue) Type() string {
+	return "uint64"
+}
+
+func (s *sizeValue) String() string { return size.Capacity(*s).String() }
