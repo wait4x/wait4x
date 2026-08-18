@@ -1,8 +1,9 @@
 // Special target: https://github.com/docker/metadata-action#bake-definition
 target "docker-metadata-action" {}
+target "docker-metadata-action-debian" {}
 
-target "image" {
-  inherits  = ["docker-metadata-action"]
+// Common configuration
+target "_common" {
   platforms = [
     "linux/amd64",
     "linux/arm/v6",
@@ -11,6 +12,39 @@ target "image" {
     "linux/ppc64le",
     "linux/s390x"
   ]
+}
+
+// Alpine variant (default)
+target "image-alpine" {
+  inherits  = ["_common", "docker-metadata-action"]
+  args = {
+    BASE_VARIANT = "alpine"
+  }
+}
+
+// Debian variant
+target "image-debian" {
+  inherits  = ["_common", "docker-metadata-action-debian"]
+  args = {
+    BASE_VARIANT = "debian"
+  }
+  // debian:bookworm-slim publishes amd64, arm/v7, arm64, 386, ppc64le.
+  platforms = [
+    "linux/amd64",
+    "linux/arm/v7",
+    "linux/arm64",
+    "linux/ppc64le"
+  ]
+}
+
+// Group to build all image variants
+group "image-all" {
+  targets = ["image-alpine", "image-debian"]
+}
+
+// Default image target (alpine)
+target "image" {
+  inherits = ["image-alpine"]
 }
 
 target "artifact" {

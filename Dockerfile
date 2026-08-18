@@ -1,7 +1,12 @@
-# syntax=docker/dockerfile:1.5.1
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
+# syntax=docker/dockerfile:1.26.0@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
+# Global so later FROM lines can interpolate it. An ARG after COPY is
+# scoped to that stage, which made BASE_VARIANT empty and produced "runtime-".
+ARG BASE_VARIANT=alpine
+
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.9.0@sha256:c64defb9ed5a91eacb37f96ccc3d4cd72521c4bd18d5442905b95e2226b0e707 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.26.6-alpine3.24@sha256:3889b425f035be855a72fb4755265311293b6d414521f0a519d819df32222d83 AS base
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=0
 
@@ -44,8 +49,14 @@ RUN --mount=from=binary,target=/build \
 FROM scratch AS artifact
 COPY --from=releaser /out /
 
-FROM alpine:3.22
+FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS runtime-alpine
 RUN apk add --update --no-cache ca-certificates tzdata
+
+FROM debian:bookworm-slim@sha256:abd67ffcfa541b485a3dff59865ab629aa048a6c613e639d36e7456b0b229241 AS runtime-debian
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM runtime-${BASE_VARIANT} AS runtime
 
 COPY --from=binary /wait4x /usr/bin/wait4x
 

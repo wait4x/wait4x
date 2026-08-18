@@ -19,9 +19,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/getsentry/size"
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
+	"go.withmatt.com/size"
 
 	"wait4x.dev/v3/checker/file"
 	"wait4x.dev/v3/internal/contextutil"

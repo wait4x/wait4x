@@ -16,7 +16,7 @@
 package cmd
 
 import (
-	"github.com/getsentry/size"
+	"go.withmatt.com/size"
 )
 
 func contains(s []string, str string) bool {

@@ -17,13 +17,13 @@ package postgresql
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"wait4x.dev/v3/checker"
 )
 
@@ -40,7 +40,9 @@ func (s *PostgreSQLSuite) SetupSuite() {
 		context.Background(),
 		"postgres:16-alpine",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
-		testcontainers.WithWaitStrategy(wait.ForListeningPort("5432")),
+		// Postgres restarts after the first "ready" log. Waiting only for the
+		// port lets the first query hit a connection reset.
+		postgres.BasicWaitStrategies(),
 	)
 
 	s.Require().NoError(err)
@@ -103,13 +105,23 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 
 func (s *PostgreSQLSuite) TestExpectTable() {
 	ctx := context.Background()
-	endpoint, err := s.container.ConnectionString(ctx)
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	_, _, err = s.container.Exec(ctx, []string{"psql", `postgresql://postgres:postgres@localhost:5432/postgres`, "-c", "CREATE TABLE my_table (id INT)"})
+	// Create the table from the host. container.Exec's error is nil when psql
+	// exits non-zero, so the previous in-container CREATE TABLE was a no-op.
+	db, err := sql.Open("postgres", endpoint)
+	s.Require().NoError(err)
+	s.T().Cleanup(func() {
+		if cerr := db.Close(); cerr != nil {
+			s.T().Errorf("close postgres: %v", cerr)
+		}
+	})
+
+	_, err = db.ExecContext(ctx, "CREATE TABLE my_table (id INT)")
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))
+	chk := New(endpoint, WithExpectTable("my_table"))
 	s.Assert().Nil(chk.Check(ctx))
 }
 
