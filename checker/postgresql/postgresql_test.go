@@ -24,7 +24,6 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"wait4x.dev/v3/checker"
 )
 
@@ -41,7 +40,9 @@ func (s *PostgreSQLSuite) SetupSuite() {
 		context.Background(),
 		"postgres:16-alpine",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
-		testcontainers.WithWaitStrategy(wait.ForListeningPort("5432")),
+		// Postgres restarts after the first "ready" log. Waiting only for the
+		// port lets the first query hit a connection reset.
+		postgres.BasicWaitStrategies(),
 	)
 
 	s.Require().NoError(err)
