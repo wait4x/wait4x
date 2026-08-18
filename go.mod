@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/antchfx/htmlquery v1.3.6
-	github.com/go-logr/logr v1.4.3
+	github.com/go-logr/logr v1.4.4
 	github.com/go-logr/stdr v1.2.2
 	github.com/go-logr/zerologr v1.2.3
 	github.com/go-redis/redis/v8 v8.11.5
