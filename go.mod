@@ -29,7 +29,7 @@ require (
 	go.mongodb.org/mongo-driver v1.17.9
 	go.temporal.io/api v1.63.5
 	google.golang.org/grpc v1.79.3
-	mvdan.cc/sh/v3 v3.12.0
+	mvdan.cc/sh/v3 v3.13.1
 )
 
 require (
