@@ -25,7 +25,7 @@ import (
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"wait4x.dev/v3/internal/test"
+	"wait4x.dev/v4/internal/test"
 
 	"github.com/stretchr/testify/assert"
 )

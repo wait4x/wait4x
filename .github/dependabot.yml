@@ -1,25 +1,23 @@
 version: 2
 updates:
   - package-ecosystem: docker
+    target-branch: "4.x" # This line should be deleted prior to the v4.0.0 release
     directory: /
-    reviewers:
-      - "atkrad"
     assignees:
       - "atkrad"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
       docker:
         patterns:
           - "*"
 
   - package-ecosystem: "gomod"
+    target-branch: "4.x" # This line should be deleted prior to the v4.0.0 release
     open-pull-requests-limit: 10
     directory: "/"
     schedule:
-      interval: "daily"
-    reviewers:
-      - "atkrad"
+      interval: "weekly"
     assignees:
       - "atkrad"
     labels:
@@ -30,11 +28,10 @@ updates:
           - github.com/testcontainers/*
 
   - package-ecosystem: "github-actions"
+    target-branch: "4.x" # This line should be deleted prior to the v4.0.0 release
     directory: "/"
     schedule:
-      interval: "daily"
-    reviewers:
-      - "atkrad"
+      interval: "weekly"
     assignees:
       - "atkrad"
     labels:

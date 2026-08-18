@@ -21,9 +21,9 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
-	dns "wait4x.dev/v3/checker/dns/cname"
-	"wait4x.dev/v3/internal/contextutil"
-	"wait4x.dev/v3/waiter"
+	dns "wait4x.dev/v4/checker/dns/cname"
+	"wait4x.dev/v4/internal/contextutil"
+	"wait4x.dev/v4/waiter"
 )
 
 // NewCNAMECommand creates a new DNS CNAME command

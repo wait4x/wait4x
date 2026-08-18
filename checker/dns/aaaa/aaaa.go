@@ -18,10 +18,11 @@ package aaaa
 import (
 	"context"
 	"fmt"
-	"github.com/miekg/dns"
-	dns2 "wait4x.dev/v3/checker/dns"
 
-	"wait4x.dev/v3/checker"
+	"github.com/miekg/dns"
+	dns2 "wait4x.dev/v4/checker/dns"
+
+	"wait4x.dev/v4/checker"
 )
 
 // Option configures an DNS AAAA records

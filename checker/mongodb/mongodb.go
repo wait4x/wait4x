@@ -25,7 +25,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 var hidePasswordRegexp = regexp.MustCompile(`^(mongodb://[^/:]+):[^:@]+@`)

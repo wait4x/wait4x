@@ -24,7 +24,7 @@ import (
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 var hidePasswordRegexp = regexp.MustCompile(`(amqp://[^/:]+):[^:@]+@`)

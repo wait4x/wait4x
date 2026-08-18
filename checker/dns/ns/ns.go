@@ -20,7 +20,7 @@ import (
 	"net"
 	"regexp"
 
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // Option configures an DNS NS records

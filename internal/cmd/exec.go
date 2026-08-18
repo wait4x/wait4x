@@ -23,9 +23,9 @@ import (
 	"github.com/spf13/cobra"
 	"mvdan.cc/sh/v3/shell"
 
-	"wait4x.dev/v3/checker/exec"
-	"wait4x.dev/v3/internal/contextutil"
-	"wait4x.dev/v3/waiter"
+	"wait4x.dev/v4/checker/exec"
+	"wait4x.dev/v4/internal/contextutil"
+	"wait4x.dev/v4/waiter"
 )
 
 // NewExecCommand creates a new exec sub-command

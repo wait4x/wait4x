@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/tonglil/buflogr"
-	"wait4x.dev/v3/checker"
+	"wait4x.dev/v4/checker"
 )
 
 // TestMain is the main function for the Waiter.
@@ -81,7 +81,7 @@ func TestWaitLogger(t *testing.T) {
 
 	var buf bytes.Buffer
 	var log = buflogr.NewWithBuffer(&buf)
-	err := WaitContext(context.TODO(), mockChecker, WithLogger(log), WithTimeout(time.Second))
+	err := WaitContext(context.Background(), mockChecker, WithLogger(log), WithTimeout(time.Second))
 
 	assert.Equal(t, context.DeadlineExceeded, err)
 	assert.Contains(t, buf.String(), "INFO [MockChecker] Checking ID ...")

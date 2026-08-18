@@ -39,8 +39,8 @@ jobs:
         go install github.com/mgechev/revive@v1.1.4
         make check-revive
 
-  test:
-    name: Test
+  test-unit:
+    name: Unit Tests
     needs: check
     runs-on: ubuntu-latest
     steps:
@@ -52,13 +52,76 @@ jobs:
       with:
         go-version: 1.26.6
 
-    - name: Test Wait4X
+    - name: Run Unit Tests
       run: make test
+
+    - name: Upload unit coverage
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: coverage-unit
+        path: coverage.out
+        retention-days: 1
+
+  test-integration:
+    name: Integration Tests
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version: 1.26.6
+
+    - name: Run Integration Tests
+      run: make test-integration
+
+    - name: Upload integration coverage
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: coverage-integration
+        path: coverage-integration.out
+        retention-days: 1
+
+  coverage:
+    name: Coverage Report
+    needs: [test-unit, test-integration]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version: 1.26.6
+
+    - name: Download unit coverage
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage-unit
+        path: ./coverage-unit
+
+    - name: Download integration coverage
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage-integration
+        path: ./coverage-integration
+
+    - name: Install gocovmerge
+      run: go install github.com/wadey/gocovmerge@latest
+
+    - name: Merge coverage reports
+      run: |
+        gocovmerge ./coverage-unit/coverage.out ./coverage-integration/coverage-integration.out > coverage-merged.out
+        echo "Merged coverage report created"
 
     - name: Convert coverage to lcov
       uses: jandelgado/gcov2lcov-action@e4612787670fc5b5f49026b8c29c5569921de1db # v1.2.0
       with:
-        infile: coverage.out
+        infile: coverage-merged.out
         outfile: coverage.lcov
 
     - name: Coveralls
@@ -69,7 +132,7 @@ jobs:
 
   build:
     name: Build
-    needs: test
+    needs: [test-unit, test-integration]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -88,7 +151,6 @@ jobs:
           # Maintaining "atkrad/wait4x" for backward compatibility
           # Note: This will be removed in v4.0.0. Please use the "wait4x/wait4x" image going forward.
           images: | 
-            atkrad/wait4x
             wait4x/wait4x
             ghcr.io/${{ github.repository }}
           ### versioning strategy
@@ -122,7 +184,6 @@ jobs:
           # this, image-debian inherits an empty stub and has no tags to push.
           bake-target: docker-metadata-action-debian
           images: | 
-            atkrad/wait4x
             wait4x/wait4x
             ghcr.io/${{ github.repository }}
           flavor: |
@@ -157,7 +218,7 @@ jobs:
         with:
           buildkitd-config-inline: |
             [worker.oci]
-              max-parallelism = 10
+              max-parallelism = 15
 
       - name: Login to Docker Hub (docker.io)
         if: ${{ github.event_name != 'pull_request' }}

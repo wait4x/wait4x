@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	httpChecker "wait4x.dev/v3/checker/http"
-	"wait4x.dev/v3/waiter"
+	httpChecker "wait4x.dev/v4/checker/http"
+	"wait4x.dev/v4/waiter"
 )
 
 // main is the main function for the HTTP Advanced example
