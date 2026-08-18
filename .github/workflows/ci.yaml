@@ -21,12 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - name: Set up Go 1.26.x
-      uses: actions/setup-go@v7
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
-        go-version: 1.26.x
+        go-version: 1.26.6
 
     - name: go-fmt
       run: make check-gofmt
@@ -45,24 +45,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - name: Set up Go 1.26.x
-      uses: actions/setup-go@v7
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
-        go-version: 1.26.x
+        go-version: 1.26.6
 
     - name: Test Wait4X
       run: make test
 
     - name: Convert coverage to lcov
-      uses: jandelgado/gcov2lcov-action@v1.2.0
+      uses: jandelgado/gcov2lcov-action@e4612787670fc5b5f49026b8c29c5569921de1db # v1.2.0
       with:
         infile: coverage.out
         outfile: coverage.lcov
 
     - name: Coveralls
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: coverage.lcov
@@ -77,13 +77,13 @@ jobs:
       statuses: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Docker metadata (Alpine)
         id: meta-alpine
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           # Maintaining "atkrad/wait4x" for backward compatibility
           # Note: This will be removed in v4.0.0. Please use the "wait4x/wait4x" image going forward.
@@ -116,7 +116,7 @@ jobs:
 
       - name: Docker metadata (Debian)
         id: meta-debian
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           # Default bake-target is docker-metadata-action (Alpine). Without
           # this, image-debian inherits an empty stub and has no tags to push.
@@ -153,7 +153,7 @@ jobs:
             type=edge,branch=${{ github.event.repository.default_branch }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
         with:
           buildkitd-config-inline: |
             [worker.oci]
@@ -161,21 +161,21 @@ jobs:
 
       - name: Login to Docker Hub (docker.io)
         if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v4
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GitHub Container Registry (ghcr.io)
         if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v4
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build artifacts
-        uses: docker/bake-action@v7
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
         with:
           targets: artifact
           provenance: false
@@ -194,14 +194,14 @@ jobs:
           find ./dist -type d -empty -delete
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: wait4x-artifacts
           path: ./dist/*
           if-no-files-found: error
 
       - name: Build and push Alpine image
-        uses: docker/bake-action@v7
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
         with:
           targets: image-alpine
           push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
@@ -215,7 +215,7 @@ jobs:
             *.args.COMMIT_REF_SLUG=${{ github.ref_name }}
 
       - name: Build and push Debian image
-        uses: docker/bake-action@v7
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
         with:
           targets: image-debian
           push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
@@ -229,7 +229,7 @@ jobs:
             *.args.COMMIT_REF_SLUG=${{ github.ref_name }}
 
       - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v5
+        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
         if: ${{ github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -237,7 +237,7 @@ jobs:
           short-description: ${{ github.event.repository.description }}
 
       - name: GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
           draft: true
