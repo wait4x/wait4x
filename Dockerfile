@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.5.1
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.6.1 AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.9.0 AS xx
 
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS base
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine3.22 AS base
 ENV GO111MODULE=auto
 ENV CGO_ENABLED=0
 
@@ -44,7 +44,7 @@ RUN --mount=from=binary,target=/build \
 FROM scratch AS artifact
 COPY --from=releaser /out /
 
-FROM alpine:3.22
+FROM alpine:3.24
 RUN apk add --update --no-cache ca-certificates tzdata
 
 COPY --from=binary /wait4x /usr/bin/wait4x
