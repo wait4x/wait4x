@@ -13,7 +13,7 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/miekg/dns v1.1.72
 	github.com/rabbitmq/amqp091-go v1.13.0
-	github.com/rs/zerolog v1.34.0
+	github.com/rs/zerolog v1.35.1
 	github.com/segmentio/kafka-go v0.4.51
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.12.0
