@@ -24,7 +24,7 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.44.0
 	github.com/testcontainers/testcontainers-go/modules/rabbitmq v0.44.0
 	github.com/testcontainers/testcontainers-go/modules/redis v0.44.0
-	github.com/tidwall/gjson v1.18.0
+	github.com/tidwall/gjson v1.19.0
 	github.com/tonglil/buflogr v1.1.1
 	go.mongodb.org/mongo-driver v1.17.9
 	go.temporal.io/api v1.51.0
