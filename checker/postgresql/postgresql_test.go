@@ -20,14 +20,14 @@ package postgresql
 
 import (
 	"context"
+	"database/sql"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
+
 	"wait4x.dev/v4/checker"
 )
 
@@ -44,10 +44,9 @@ func (s *PostgreSQLSuite) SetupSuite() {
 		context.Background(),
 		"postgres:16-alpine",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(60*time.Second)),
+		// Postgres restarts after the first "ready" log. Waiting only for the
+		// port lets the first query hit a connection reset.
+		postgres.BasicWaitStrategies(),
 	)
 
 	s.Require().NoError(err)
@@ -111,18 +110,20 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 
 func (s *PostgreSQLSuite) TestExpectTable() {
 	ctx := context.Background()
-
-	// Create table using psql command with proper parameters
-	// The default postgres container has user=postgres, database=postgres
-	_, _, err := s.container.Exec(ctx, []string{
-		"psql",
-		"-U", "postgres",
-		"-d", "postgres",
-		"-c", "CREATE TABLE my_table (id INT)",
-	})
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
+	// Create the table from the host. container.Exec's error is nil when psql
+	// exits non-zero, so the previous in-container CREATE TABLE was a no-op.
+	db, err := sql.Open("postgres", endpoint)
+	s.Require().NoError(err)
+	s.T().Cleanup(func() {
+		if cerr := db.Close(); cerr != nil {
+			s.T().Errorf("close postgres: %v", cerr)
+		}
+	})
+
+	_, err = db.ExecContext(ctx, "CREATE TABLE my_table (id INT)")
 	s.Require().NoError(err)
 
 	chk := New(endpoint, WithExpectTable("my_table"))

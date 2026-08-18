@@ -23,8 +23,14 @@ import (
 	"wait4x.dev/v4/checker"
 )
 
-// server is the server to use for the tests
-const server = "wait4x.dev"
+const (
+	server = "wait4x.dev"
+
+	// one.one.one.one is Cloudflare DNS. Its A records are the product
+	// addresses (1.1.1.1, 1.0.0.1) and do not rotate like proxied website IPs.
+	stableHost = "one.one.one.one"
+	stableIPv4 = "1.1.1.1"
+)
 
 // TestSuite is a test suite for the A checker
 type TestSuite struct {
@@ -39,7 +45,7 @@ func (s *TestSuite) TestCheckExistenceA() {
 
 // TestCorrectA tests that the A checker correctly checks for the existence of an A record with the expected IP addresses.
 func (s *TestSuite) TestCorrectA() {
-	d := New(server, WithExpectedIPV4s([]string{"172.67.154.180", "127.0.0.1"}))
+	d := New(stableHost, WithExpectedIPV4s([]string{stableIPv4, "127.0.0.1"}))
 	s.Assert().Nil(d.Check(context.Background()))
 }
 
@@ -53,7 +59,7 @@ func (s *TestSuite) TestIncorrectA() {
 // TestCustomNSCorrectA tests that the A checker correctly checks for the existence of an A record
 // with the expected IP addresses using a custom name server.
 func (s *TestSuite) TestCustomNSCorrectA() {
-	d := New(server, WithNameServer("8.8.8.8:53"), WithExpectedIPV4s([]string{"172.67.154.180"}))
+	d := New(stableHost, WithNameServer("8.8.8.8:53"), WithExpectedIPV4s([]string{stableIPv4}))
 	s.Assert().Nil(d.Check(context.Background()))
 }
 

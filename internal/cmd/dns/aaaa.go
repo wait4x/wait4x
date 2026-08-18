@@ -45,13 +45,13 @@ func NewAAAACommand() *cobra.Command {
   wait4x dns AAAA wait4x.dev
 
   # Check AAAA records with expected IPv6 addresses
-  wait4x dns AAAA wait4x.dev --expect-ip '2606:4700:3033::ac43:9ab4'
+  wait4x dns AAAA one.one.one.one --expect-ip '2606:4700:4700::1111'
 
   # Check AAAA records with multiple expected IPv6 addresses
-  wait4x dns AAAA wait4x.dev --expect-ip '2606:4700:3033::ac43:9ab4' --expect-ip '2606:4700:3034::ac43:9ab4'
+  wait4x dns AAAA one.one.one.one --expect-ip '2606:4700:4700::1111' --expect-ip '2606:4700:4700::1001'
 
   # Check AAAA records using a specific nameserver
-  wait4x dns AAAA wait4x.dev --expect-ip '2606:4700:3033::ac43:9ab4' --nameserver gordon.ns.cloudflare.com
+  wait4x dns AAAA one.one.one.one --expect-ip '2606:4700:4700::1111' --nameserver 8.8.8.8
 
   # Check AAAA records with custom interval and timeout
   wait4x dns AAAA wait4x.dev --interval 5s --timeout 60s`,
