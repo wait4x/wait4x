@@ -17,6 +17,7 @@ package postgresql
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -103,13 +104,23 @@ func (s *PostgreSQLSuite) TestTableNotExists() {
 
 func (s *PostgreSQLSuite) TestExpectTable() {
 	ctx := context.Background()
-	endpoint, err := s.container.ConnectionString(ctx)
+	endpoint, err := s.container.ConnectionString(ctx, "sslmode=disable")
 	s.Require().NoError(err)
 
-	_, _, err = s.container.Exec(ctx, []string{"psql", `postgresql://postgres:postgres@localhost:5432/postgres`, "-c", "CREATE TABLE my_table (id INT)"})
+	// Create the table from the host. container.Exec's error is nil when psql
+	// exits non-zero, so the previous in-container CREATE TABLE was a no-op.
+	db, err := sql.Open("postgres", endpoint)
+	s.Require().NoError(err)
+	s.T().Cleanup(func() {
+		if cerr := db.Close(); cerr != nil {
+			s.T().Errorf("close postgres: %v", cerr)
+		}
+	})
+
+	_, err = db.ExecContext(ctx, "CREATE TABLE my_table (id INT)")
 	s.Require().NoError(err)
 
-	chk := New(endpoint+"sslmode=disable", WithExpectTable("my_table"))
+	chk := New(endpoint, WithExpectTable("my_table"))
 	s.Assert().Nil(chk.Check(ctx))
 }
 
