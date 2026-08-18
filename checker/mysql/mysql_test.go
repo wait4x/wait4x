@@ -17,13 +17,13 @@ package mysql
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"wait4x.dev/v3/checker"
 )
 
@@ -36,11 +36,12 @@ type MySQLSuite struct {
 // SetupSuite starts a MySQL container
 func (s *MySQLSuite) SetupSuite() {
 	var err error
+	// Use the module default wait (log "port: 3306  MySQL Community Server").
+	// Waiting only for 33060 (X Protocol) lets the first handshake hit EOF.
 	s.container, err = mysql.Run(
 		context.Background(),
 		"mysql:8.0.36",
 		testcontainers.WithLogger(log.TestLogger(s.T())),
-		testcontainers.WithWaitStrategy(wait.ForListeningPort("33060")),
 	)
 
 	s.Require().NoError(err)
@@ -102,11 +103,20 @@ func (s *MySQLSuite) TestTableNotExists() {
 
 func (s *MySQLSuite) TestExpectTable() {
 	ctx := context.Background()
-
-	_, _, err := s.container.Exec(ctx, []string{"mysql", "-u", "test", "-ptest", "-D", "test", "-e", "CREATE TABLE my_table (id INT)"})
+	endpoint, err := s.container.ConnectionString(ctx)
 	s.Require().NoError(err)
 
-	endpoint, err := s.container.ConnectionString(ctx)
+	// Create the table from the host. container.Exec's error is nil when mysql
+	// exits non-zero, so an in-container CREATE TABLE can silently fail.
+	db, err := sql.Open("mysql", endpoint)
+	s.Require().NoError(err)
+	s.T().Cleanup(func() {
+		if cerr := db.Close(); cerr != nil {
+			s.T().Errorf("close mysql: %v", cerr)
+		}
+	})
+
+	_, err = db.ExecContext(ctx, "CREATE TABLE my_table (id INT)")
 	s.Require().NoError(err)
 
 	chk := New(endpoint, WithExpectTable("my_table"))
