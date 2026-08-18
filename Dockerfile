@@ -50,10 +50,13 @@ FROM scratch AS artifact
 COPY --from=releaser /out /
 
 FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS runtime-alpine
-RUN apk add --update --no-cache ca-certificates tzdata
+RUN apk --update upgrade --no-cache \
+    && apk add --no-cache ca-certificates tzdata
 
 FROM debian:bookworm-slim@sha256:abd67ffcfa541b485a3dff59865ab629aa048a6c613e639d36e7456b0b229241 AS runtime-debian
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tzdata \
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 FROM runtime-${BASE_VARIANT} AS runtime
