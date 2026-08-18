@@ -28,6 +28,14 @@ target "image-debian" {
   args = {
     BASE_VARIANT = "debian"
   }
+  // debian:bookworm-slim has no linux/arm/v6 image.
+  platforms = [
+    "linux/amd64",
+    "linux/arm/v7",
+    "linux/arm64",
+    "linux/ppc64le",
+    "linux/s390x"
+  ]
 }
 
 // Group to build all image variants
