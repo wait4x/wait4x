@@ -21,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
 
     - name: Set up Go 1.24.x
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version: 1.24.x
 
@@ -45,10 +45,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
 
     - name: Set up Go 1.24.x
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version: 1.24.x
 
@@ -77,13 +77,13 @@ jobs:
       statuses: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Docker metadata (Alpine)
         id: meta-alpine
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           # Maintaining "atkrad/wait4x" for backward compatibility
           # Note: This will be removed in v4.0.0. Please use the "wait4x/wait4x" image going forward.
@@ -116,7 +116,7 @@ jobs:
 
       - name: Docker metadata (Debian)
         id: meta-debian
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           # Default bake-target is docker-metadata-action (Alpine). Without
           # this, image-debian inherits an empty stub and has no tags to push.
@@ -153,7 +153,7 @@ jobs:
             type=edge,branch=${{ github.event.repository.default_branch }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
         with:
           buildkitd-config-inline: |
             [worker.oci]
@@ -161,21 +161,21 @@ jobs:
 
       - name: Login to Docker Hub (docker.io)
         if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GitHub Container Registry (ghcr.io)
         if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build artifacts
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           targets: artifact
           provenance: false
@@ -194,14 +194,14 @@ jobs:
           find ./dist -type d -empty -delete
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wait4x-artifacts
           path: ./dist/*
           if-no-files-found: error
 
       - name: Build and push Alpine image
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           targets: image-alpine
           push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
@@ -215,7 +215,7 @@ jobs:
             *.args.COMMIT_REF_SLUG=${{ github.ref_name }}
 
       - name: Build and push Debian image
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           targets: image-debian
           push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
@@ -237,7 +237,7 @@ jobs:
           short-description: ${{ github.event.repository.description }}
 
       - name: GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
           draft: true
