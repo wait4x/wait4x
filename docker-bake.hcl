@@ -28,7 +28,7 @@ target "image-debian" {
   args = {
     BASE_VARIANT = "debian"
   }
-  // debian:bookworm-slim publishes amd64, arm/v7, arm64, 386, ppc64le.
+  // debian:13.6-slim publishes amd64, arm/v7, arm64, 386, ppc64le.
   platforms = [
     "linux/amd64",
     "linux/arm/v7",

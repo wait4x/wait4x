@@ -11,7 +11,8 @@ ENV GO111MODULE=auto
 ENV CGO_ENABLED=0
 
 COPY --from=xx / /
-RUN apk add --update --no-cache build-base coreutils git
+RUN apk --update upgrade --no-cache \
+    && apk add --no-cache build-base coreutils git
 WORKDIR /src
 
 FROM base AS build
@@ -53,7 +54,7 @@ FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6ee
 RUN apk --update upgrade --no-cache \
     && apk add --no-cache ca-certificates tzdata
 
-FROM debian:bookworm-slim@sha256:abd67ffcfa541b485a3dff59865ab629aa048a6c613e639d36e7456b0b229241 AS runtime-debian
+FROM debian:13.6-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3bb48c7f8e94f258 AS runtime-debian
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata \
