@@ -125,8 +125,12 @@ jobs:
             atkrad/wait4x
             wait4x/wait4x
             ghcr.io/${{ github.repository }}
+          # latest=false is required. onlatest=false only skips adding
+          # -debian to :latest; latest=auto would still emit :latest and
+          # overwrite the Alpine image (v3.7.0 hit this).
           flavor: |
-            suffix=-debian,onlatest=false
+            latest=false
+            suffix=-debian
           ### versioning strategy
           ### push semver tag v3.2.1 on the default branch
           # wait4x/wait4x:debian
