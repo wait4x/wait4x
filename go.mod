@@ -1,6 +1,6 @@
 module wait4x.dev/v3
 
-go 1.25.4
+go 1.26.0
 
 require (
 	github.com/antchfx/htmlquery v1.3.6
@@ -29,7 +29,7 @@ require (
 	go.mongodb.org/mongo-driver v1.17.9
 	go.temporal.io/api v1.63.5
 	google.golang.org/grpc v1.83.0
-	mvdan.cc/sh/v3 v3.13.1
+	mvdan.cc/sh/v3 v3.14.0
 )
 
 require (
