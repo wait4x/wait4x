@@ -36,7 +36,7 @@
         pname = packageName;
         inherit version;
         src = self;
-        vendorHash = "sha256-ODcHrmmHHeZbi1HVDkYPCyHs7mcs2UGdBzicP1+eOSI=";
+        vendorHash = "sha256-qsVXm0W8R0xjlN4jvE70tmCr8WFScX7zMbtYR0LmJdg=";
         doCheck = false;
         nativeBuildInputs = with pkgs; [git];
         GOCACHE = "$(mktemp -d)";
