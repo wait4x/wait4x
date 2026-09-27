@@ -159,3 +159,49 @@ func TestHTTPH2CFlagSuccess(t *testing.T) {
 	)
 	assert.Nil(t, err)
 }
+
+func TestHTTPRequestWithRequestMethod(t *testing.T) {
+	var receivedMethod string
+	hts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedMethod = r.Method
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer hts.Close()
+
+	rootCmd := NewRootCommand()
+	rootCmd.AddCommand(NewHTTPCommand())
+
+	_, err := test.ExecuteCommand(
+		rootCmd,
+		"http",
+		hts.URL,
+		"--request-method", "HEAD",
+		"--expect-status-code", "200",
+	)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.MethodHead, receivedMethod)
+}
+
+func TestHTTPRequestWithHTTPMethod(t *testing.T) {
+	var receivedMethod string
+	hts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedMethod = r.Method
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer hts.Close()
+
+	rootCmd := NewRootCommand()
+	rootCmd.AddCommand(NewHTTPCommand())
+
+	_, err := test.ExecuteCommand(
+		rootCmd,
+		"http",
+		hts.URL,
+		"--http-method", "head",
+		"--expect-status-code", "200",
+	)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.MethodHead, receivedMethod)
+}

@@ -366,3 +366,45 @@ func TestHttpRequestHeaderWithoutInit(t *testing.T) {
 	)
 	assert.Nil(t, hc.Check(context.TODO()))
 }
+
+// TestHttpRequestMethod tests the HTTP checker with custom HTTP methods like HEAD and PUT.
+func TestHttpRequestMethod(t *testing.T) {
+	var receivedMethod string
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedMethod = r.Method
+		w.Header().Set("X-Custom-Header", "Present")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	// Explicit HEAD method
+	hc := New(
+		ts.URL,
+		WithRequestMethod(http.MethodHead),
+		WithExpectStatusCode(http.StatusOK),
+		WithExpectHeader("X-Custom-Header=Present"),
+	)
+	err := hc.Check(context.TODO())
+	assert.Nil(t, err)
+	assert.Equal(t, http.MethodHead, receivedMethod)
+
+	// Case-insensitivity test (lowercase "head" with WithMethod alias)
+	hc = New(
+		ts.URL,
+		WithMethod("head"),
+		WithExpectStatusCode(http.StatusOK),
+	)
+	err = hc.Check(context.TODO())
+	assert.Nil(t, err)
+	assert.Equal(t, http.MethodHead, receivedMethod)
+
+	// Custom PUT method
+	hc = New(
+		ts.URL,
+		WithRequestMethod("PUT"),
+		WithExpectStatusCode(http.StatusOK),
+	)
+	err = hc.Check(context.TODO())
+	assert.Nil(t, err)
+	assert.Equal(t, "PUT", receivedMethod)
+}
