@@ -66,6 +66,13 @@ docker pull wait4x/wait4x:latest
 # Run the container
 docker run --rm wait4x/wait4x:latest --help
 ```
+
+For environments requiring non-root containers (e.g. Kubernetes, security compliance with Trivy / CIS Docker 4.1), use the `nonroot` tags (`nobody:nobody` / `65534:65534`):
+
+```bash
+docker pull wait4x/wait4x:nonroot
+docker pull wait4x/wait4x:debian-nonroot
+```
 </details>
 
 <details>
