@@ -52,6 +52,8 @@ func NewExecCommand() *cobra.Command {
 	}
 
 	execCommand.Flags().Int("exit-code", 0, "Expected exit code from the command")
+	execCommand.Flags().String("expect-stdout-regex", "", "Expect command STDOUT pattern.")
+	execCommand.Flags().String("expect-stderr-regex", "", "Expect command STDERR pattern.")
 
 	return execCommand
 }
@@ -59,6 +61,8 @@ func NewExecCommand() *cobra.Command {
 // runExec runs the exec command
 func runExec(cmd *cobra.Command, args []string) error {
 	exitCode, _ := cmd.Flags().GetInt("exit-code")
+	expectStdoutRegex, _ := cmd.Flags().GetString("expect-stdout-regex")
+	expectStderrRegex, _ := cmd.Flags().GetString("expect-stderr-regex")
 
 	logger, err := logr.FromContext(cmd.Context())
 	if err != nil {
@@ -90,6 +94,8 @@ func runExec(cmd *cobra.Command, args []string) error {
 	checker := exec.New(command,
 		exec.WithArgs(commandArgs),
 		exec.WithExpectExitCode(exitCode),
+		exec.WithExpectStdoutRegex(expectStdoutRegex),
+		exec.WithExpectStderrRegex(expectStderrRegex),
 	)
 
 	return waiter.WaitContext(

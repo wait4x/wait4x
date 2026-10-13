@@ -401,6 +401,14 @@ Wait for a shell command to succeed or return a specific exit code.
   ```bash
   wait4x exec 'ls target/debug/main' --exit-code 2
   ```
+- **Check docker container status:**
+  ```bash
+  wait4x exec 'docker inspect -f {{.State.Running}} my_container_name' --expect-stdout-regex "true"
+  ```
+- **Check lockfile is absent:**
+  ```bash
+  wait4x exec 'ls /run/daemon/init.lock' --exit-code 2 --expect-stderr-regex "No such file or directory"
+  ```
 
 ---
 
