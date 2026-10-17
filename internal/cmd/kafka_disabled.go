@@ -32,3 +32,7 @@ func NewKafkaCommand() *cobra.Command {
 		},
 	}
 }
+
+func newKafkaChecker(_ string, _ ServiceConfig) (checker.Checker, error) {
+	return nil, errors.New("kafka feature disabled in this build")
+}
