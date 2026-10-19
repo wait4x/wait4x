@@ -179,7 +179,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build artifacts
-        uses: docker/bake-action@018cb6412ab401ebaa809aa5f85966b74628600f # v7.4.0
+        uses: docker/bake-action@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
         with:
           targets: artifact
           provenance: false
@@ -198,14 +198,14 @@ jobs:
           find ./dist -type d -empty -delete
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: wait4x-artifacts
           path: ./dist/*
           if-no-files-found: error
 
       - name: Build and push Alpine image
-        uses: docker/bake-action@018cb6412ab401ebaa809aa5f85966b74628600f # v7.4.0
+        uses: docker/bake-action@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
         with:
           targets: image-alpine
           push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
@@ -219,7 +219,7 @@ jobs:
             *.args.COMMIT_REF_SLUG=${{ github.ref_name }}
 
       - name: Build and push Debian image
-        uses: docker/bake-action@018cb6412ab401ebaa809aa5f85966b74628600f # v7.4.0
+        uses: docker/bake-action@59cb1203cd42bcefd40a1b6d73b589e48c86040e # v7.5.0
         with:
           targets: image-debian
           push: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
