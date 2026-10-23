@@ -60,9 +60,16 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-FROM runtime-${BASE_VARIANT} AS runtime
+FROM runtime-${BASE_VARIANT} AS runtime-base
 
 COPY --from=binary /wait4x /usr/bin/wait4x
 
 ENTRYPOINT ["wait4x"]
 CMD ["help"]
+
+FROM runtime-base AS runtime-nonroot
+
+USER 65534:65534
+
+FROM runtime-base AS runtime
+
