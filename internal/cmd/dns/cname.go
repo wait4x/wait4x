@@ -44,10 +44,10 @@ func NewCNAMECommand() *cobra.Command {
   wait4x dns CNAME example.com
 
   # Check CNAME records with expected domains
-  wait4x dns CNAME example.com --expected-domain target.example.com
+  wait4x dns CNAME example.com --expect-domain target.example.com
 
   # Check CNAME record using a specific nameserver
-  wait4x dns CNAME example.com --expected-domain target.example.com -n 8.8.8.8
+  wait4x dns CNAME example.com --expect-domain target.example.com -n 8.8.8.8
 
   # Check CNAME record with custom timeout and interval
   wait4x dns CNAME example.com --timeout 30s --interval 5s

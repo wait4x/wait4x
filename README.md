@@ -249,29 +249,29 @@ Check for various DNS record types and values.
 
 - **A record:**
   ```bash
-  wait4x dns A example.com
-  wait4x dns A example.com --expected-ip 93.184.216.34
-  wait4x dns A example.com --expected-ip 93.184.216.34 -n 8.8.8.8
+  wait4x dns A one.one.one.one
+  wait4x dns A one.one.one.one --expect-ip 1.1.1.1
+  wait4x dns A one.one.one.one --expect-ip 1.1.1.1 -n 8.8.8.8
   ```
 - **AAAA record (IPv6):**
   ```bash
-  wait4x dns AAAA example.com --expected-ip "2606:2800:220:1:248:1893:25c8:1946"
+  wait4x dns AAAA one.one.one.one --expect-ip '2606:4700:4700::1111'
   ```
 - **CNAME record:**
   ```bash
-  wait4x dns CNAME www.example.com --expected-domain example.com
+  wait4x dns CNAME www.github.com --expect-domain github.com
   ```
 - **MX record:**
   ```bash
-  wait4x dns MX example.com --expected-domain "mail.example.com"
+  wait4x dns MX wait4x.dev --expect-domain 'route1.mx.cloudflare.net'
   ```
 - **NS record:**
   ```bash
-  wait4x dns NS example.com --expected-nameserver "ns1.example.com"
+  wait4x dns NS wait4x.dev --expect-nameserver 'emma.ns.cloudflare.com'
   ```
 - **TXT record:**
   ```bash
-  wait4x dns TXT example.com --expected-value "v=spf1 include:_spf.example.com ~all"
+  wait4x dns TXT wait4x.dev --expect-value 'include:_spf.mx.cloudflare.net'
   ```
 
 ---
