@@ -79,3 +79,7 @@ func runKafka(cmd *cobra.Command, args []string) error {
 		waiter.WithLogger(logger),
 	)
 }
+
+func newKafkaChecker(target string, _ ServiceConfig) (checker.Checker, error) {
+	return kafka.New(target), nil
+}

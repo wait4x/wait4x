@@ -18,8 +18,14 @@
 package temporal
 
 import (
+	"errors"
+	"fmt"
+	"strings"
+	"time"
+
 	"github.com/spf13/cobra"
 
+	"wait4x.dev/v3/checker"
 	"wait4x.dev/v3/checker/temporal"
 )
 
@@ -38,4 +44,57 @@ func NewTemporalCommand() *cobra.Command {
 	temporalCommand.AddCommand(NewWorkerCommand())
 
 	return temporalCommand
+}
+
+// TemporalServiceConfig contains configuration options for temporal checker
+type TemporalServiceConfig struct {
+	Mode                      string
+	Namespace                 string
+	TaskQueue                 string
+	ExpectWorkerIdentityRegex string
+	ConnectionTimeout         *time.Duration
+	InsecureTransport         *bool
+	InsecureSkipTLSVerify     *bool
+}
+
+// CreateTemporalChecker creates a new Temporal checker from configuration
+func CreateTemporalChecker(target string, sc TemporalServiceConfig) (checker.Checker, error) {
+	var mode temporal.CheckMode = temporal.CheckModeServer
+	if sc.Mode != "" {
+		switch strings.ToLower(sc.Mode) {
+		case "server":
+			mode = temporal.CheckModeServer
+		case "worker":
+			mode = temporal.CheckModeWorker
+		default:
+			return nil, fmt.Errorf("invalid temporal mode: %s (must be server or worker)", sc.Mode)
+		}
+	}
+
+	var opts []temporal.Option
+	if sc.ConnectionTimeout != nil {
+		opts = append(opts, temporal.WithTimeout(*sc.ConnectionTimeout))
+	}
+	if sc.InsecureTransport != nil {
+		opts = append(opts, temporal.WithInsecureTransport(*sc.InsecureTransport))
+	}
+	if sc.InsecureSkipTLSVerify != nil {
+		opts = append(opts, temporal.WithInsecureSkipTLSVerify(*sc.InsecureSkipTLSVerify))
+	}
+
+	if mode == temporal.CheckModeWorker {
+		if sc.Namespace == "" {
+			return nil, errors.New("temporal worker mode requires namespace")
+		}
+		if sc.TaskQueue == "" {
+			return nil, errors.New("temporal worker mode requires task-queue")
+		}
+		opts = append(opts, temporal.WithNamespace(sc.Namespace))
+		opts = append(opts, temporal.WithTaskQueue(sc.TaskQueue))
+		if sc.ExpectWorkerIdentityRegex != "" {
+			opts = append(opts, temporal.WithExpectWorkerIdentityRegex(sc.ExpectWorkerIdentityRegex))
+		}
+	}
+
+	return temporal.New(mode, target, opts...), nil
 }
