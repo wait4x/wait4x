@@ -80,3 +80,7 @@ func runInfluxDB(cmd *cobra.Command, args []string) error {
 		waiter.WithLogger(logger),
 	)
 }
+
+func newInfluxDBChecker(target string, _ ServiceConfig) (checker.Checker, error) {
+	return influxdb.New(target), nil
+}
