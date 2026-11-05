@@ -33,3 +33,7 @@ func NewMysqlCommand() *cobra.Command {
 		},
 	}
 }
+
+func newMySQLChecker(_ string, _ ServiceConfig) (checker.Checker, error) {
+	return nil, errors.New("mysql feature disabled in this build")
+}

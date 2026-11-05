@@ -90,3 +90,12 @@ func runMysql(cmd *cobra.Command, args []string) error {
 		waiter.WithLogger(logger),
 	)
 }
+
+func newMySQLChecker(target string, sc ServiceConfig) (checker.Checker, error) {
+	var opts []mysql.Option
+	if sc.ExpectTable != "" {
+		opts = append(opts, mysql.WithExpectTable(sc.ExpectTable))
+	}
+
+	return mysql.New(target, opts...), nil
+}

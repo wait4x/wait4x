@@ -33,3 +33,7 @@ func NewPostgresqlCommand() *cobra.Command {
 		},
 	}
 }
+
+func newPostgreSQLChecker(_ string, _ ServiceConfig) (checker.Checker, error) {
+	return nil, errors.New("postgresql feature disabled in this build")
+}

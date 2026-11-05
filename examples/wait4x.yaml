@@ -1,0 +1,77 @@
+# Wait4X configuration example
+# Global waiter settings
+timeout: 30s
+interval: 2s
+invert-check: false
+backoff-policy: linear
+backoff-exponential-max-interval: 10s
+backoff-exponential-coefficient: 2.0
+
+# Service definitions
+services:
+  # TCP service check
+  - name: tcp-service
+    type: tcp
+    target: 127.0.0.1:9090
+    connection-timeout: 3s
+
+  # HTTP service check with status and JSON validation
+  - name: http-health-check
+    type: http
+    target: http://127.0.0.1:8080/health
+    expect-status-code: 200
+    expect-body-json: status
+    connection-timeout: 5s
+
+  # Redis service check with key verification
+  - name: redis-cache
+    type: redis
+    target: redis://127.0.0.1:6379
+    expect-key: cache_ready
+    connection-timeout: 3s
+
+  # PostgreSQL database check
+  - name: postgres-db
+    type: postgresql
+    target: postgres://postgres:password@127.0.0.1:5432/app_db?sslmode=disable
+    expect-table: schema_migrations
+
+  # MySQL database check
+  - name: mysql-db
+    type: mysql
+    target: root:password@tcp(127.0.0.1:3306)/app_db
+    expect-table: users
+
+  # MongoDB check
+  - name: mongo-db
+    type: mongodb
+    target: mongodb://127.0.0.1:27017
+
+  # InfluxDB check
+  - name: metrics-influxdb
+    type: influxdb
+    target: http://127.0.0.1:8086
+
+  # Kafka broker check
+  - name: message-broker-kafka
+    type: kafka
+    target: 127.0.0.1:9092
+
+  # RabbitMQ check
+  - name: message-broker-rabbitmq
+    type: rabbitmq
+    target: amqp://guest:guest@127.0.0.1:5672/
+    connection-timeout: 3s
+
+  # Command execution check
+  - name: cli-tool-ready
+    type: exec
+    command: echo ready
+    expect-exit-code: 0
+
+  # DNS record check
+  - name: domain-dns-a
+    type: dns
+    subtype: A
+    target: wait4x.dev
+    nameserver: 1.1.1.1:53

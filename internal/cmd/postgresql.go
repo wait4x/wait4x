@@ -88,3 +88,12 @@ func runPostgresql(cmd *cobra.Command, args []string) error {
 		waiter.WithLogger(logger),
 	)
 }
+
+func newPostgreSQLChecker(target string, sc ServiceConfig) (checker.Checker, error) {
+	var opts []postgresql.Option
+	if sc.ExpectTable != "" {
+		opts = append(opts, postgresql.WithExpectTable(sc.ExpectTable))
+	}
+
+	return postgresql.New(target, opts...), nil
+}

@@ -83,3 +83,7 @@ func runMongoDB(cmd *cobra.Command, args []string) error {
 		waiter.WithLogger(logger),
 	)
 }
+
+func newMongoDBChecker(target string, _ ServiceConfig) (checker.Checker, error) {
+	return mongodb.New(target), nil
+}

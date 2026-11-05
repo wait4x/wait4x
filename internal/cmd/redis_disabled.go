@@ -32,3 +32,7 @@ func NewRedisCommand() *cobra.Command {
 		},
 	}
 }
+
+func newRedisChecker(_ string, _ ServiceConfig) (checker.Checker, error) {
+	return nil, errors.New("redis feature disabled in this build")
+}

@@ -109,3 +109,15 @@ func runRedis(cmd *cobra.Command, args []string) error {
 		waiter.WithLogger(logger),
 	)
 }
+
+func newRedisChecker(target string, sc ServiceConfig) (checker.Checker, error) {
+	var opts []redis.Option
+	if sc.ConnectionTimeout != nil {
+		opts = append(opts, redis.WithTimeout(*sc.ConnectionTimeout))
+	}
+	if sc.ExpectKey != "" {
+		opts = append(opts, redis.WithExpectKey(sc.ExpectKey))
+	}
+
+	return redis.New(target, opts...), nil
+}

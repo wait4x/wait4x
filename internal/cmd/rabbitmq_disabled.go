@@ -32,3 +32,7 @@ func NewRabbitMQCommand() *cobra.Command {
 		},
 	}
 }
+
+func newRabbitMQChecker(_ string, _ ServiceConfig) (checker.Checker, error) {
+	return nil, errors.New("rabbitmq feature disabled in this build")
+}

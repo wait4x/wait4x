@@ -33,3 +33,7 @@ func NewMongoDBCommand() *cobra.Command {
 		},
 	}
 }
+
+func newMongoDBChecker(_ string, _ ServiceConfig) (checker.Checker, error) {
+	return nil, errors.New("mongodb feature disabled in this build")
+}

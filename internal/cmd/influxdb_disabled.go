@@ -33,3 +33,7 @@ func NewInfluxDBCommand() *cobra.Command {
 		},
 	}
 }
+
+func newInfluxDBChecker(_ string, _ ServiceConfig) (checker.Checker, error) {
+	return nil, errors.New("influxdb feature disabled in this build")
+}

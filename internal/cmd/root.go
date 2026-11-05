@@ -53,6 +53,17 @@ func NewRootCommand() *cobra.Command {
 		CompletionOptions: cobra.CompletionOptions{
 			HiddenDefaultCmd: true,
 		},
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			configFile, err := cmd.Flags().GetString("config")
+			if err != nil {
+				return fmt.Errorf("unable to parse --config flag: %w", err)
+			}
+			if configFile == "" {
+				return cmd.Help()
+			}
+
+			return runConfig(cmd, configFile)
+		},
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) (err error) {
 			quiet, err := cmd.Flags().GetBool("quiet")
 			if err != nil {
@@ -168,6 +179,7 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.PersistentFlags().MarkDeprecated("log-level", "You don't need to the flag anymore. By default, Wait4X returns error logs. This flag will be removed in v4.0.0")
 	rootCmd.PersistentFlags().Bool("no-color", false, "If specified, output won't contain any color.")
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Quiet or silent mode. Do not show logs or error messages.")
+	rootCmd.PersistentFlags().StringP("config", "c", "", "Path to the configuration file (YAML or JSON).")
 
 	return rootCmd
 }
@@ -175,6 +187,7 @@ func NewRootCommand() *cobra.Command {
 // Execute run Wait4X application
 func Execute() {
 	rootCmd := NewRootCommand()
+	rootCmd.AddCommand(NewConfigCommand())
 	rootCmd.AddCommand(NewTCPCommand())
 	rootCmd.AddCommand(dns.NewDNSCommand())
 	rootCmd.AddCommand(NewHTTPCommand())

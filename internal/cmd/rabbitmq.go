@@ -99,3 +99,15 @@ func runRabbitMQ(cmd *cobra.Command, args []string) error {
 		waiter.WithLogger(logger),
 	)
 }
+
+func newRabbitMQChecker(target string, sc ServiceConfig) (checker.Checker, error) {
+	var opts []rabbitmq.Option
+	if sc.ConnectionTimeout != nil {
+		opts = append(opts, rabbitmq.WithTimeout(*sc.ConnectionTimeout))
+	}
+	if sc.InsecureSkipTLSVerify != nil {
+		opts = append(opts, rabbitmq.WithInsecureSkipTLSVerify(*sc.InsecureSkipTLSVerify))
+	}
+
+	return rabbitmq.New(target, opts...), nil
+}
