@@ -97,6 +97,10 @@ func NewHTTPCommand() *cobra.Command {
   # Self-signed certificates
   wait4x http https://www.wait4x.dev --cert-file /path/to/certfile --key-file /path/to/keyfile
 
+  # If you want checking http connection with a specific HTTP method (e.g. HEAD, GET, POST):
+  wait4x http https://ifconfig.co --request-method HEAD --expect-status-code 200
+  wait4x http https://ifconfig.co --http-method HEAD --expect-status-code 200
+
   # CA file
   wait4x http https://www.wait4x.dev --ca-file /path/to/cafile`,
 		RunE: runHTTP,
@@ -109,6 +113,8 @@ func NewHTTPCommand() *cobra.Command {
 	httpCommand.Flags().String("expect-header", "", "Expect response header pattern.")
 	httpCommand.Flags().StringArray("request-header", nil, "User request headers.")
 	httpCommand.Flags().String("request-body", "", "User request body.")
+	httpCommand.Flags().String("request-method", "", "HTTP method to use (e.g. GET, POST, HEAD).")
+	httpCommand.Flags().String("http-method", "", "Alias for --request-method.")
 	httpCommand.Flags().
 		Duration("connection-timeout", http.DefaultConnectionTimeout, "Http connection timeout, The timeout includes connection time, any redirects, and reading the response body.")
 	httpCommand.Flags().
@@ -141,6 +147,11 @@ func runHTTP(cmd *cobra.Command, args []string) error {
 	certFile, _ := cmd.Flags().GetString("cert-file")
 	keyFile, _ := cmd.Flags().GetString("key-file")
 	h2c, _ := cmd.Flags().GetBool("h2c")
+	requestMethod, _ := cmd.Flags().GetString("request-method")
+	httpMethod, _ := cmd.Flags().GetString("http-method")
+	if requestMethod == "" && httpMethod != "" {
+		requestMethod = httpMethod
+	}
 
 	logger, err := logr.FromContext(cmd.Context())
 	if err != nil {
@@ -189,6 +200,7 @@ func runHTTP(cmd *cobra.Command, args []string) error {
 			http.WithExpectHeader(expectHeader),
 			http.WithRequestHeaders(requestHeaders),
 			http.WithRequestBody(requestBodyReader),
+			http.WithRequestMethod(requestMethod),
 			http.WithTimeout(connectionTimeout),
 			http.WithInsecureSkipTLSVerify(insecureSkipTLSVerify),
 			http.WithNoRedirect(noRedirect),

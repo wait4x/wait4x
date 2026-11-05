@@ -57,6 +57,7 @@ type HTTP struct {
 	expectHeader          string
 	requestHeaders        http.Header
 	requestBody           io.Reader
+	requestMethod         string
 	expectStatusCode      int
 	insecureSkipTLSVerify bool
 	noRedirect            bool
@@ -130,6 +131,18 @@ func WithRequestBody(body io.Reader) Option {
 	return func(h *HTTP) {
 		h.requestBody = body
 	}
+}
+
+// WithRequestMethod configures the HTTP request method
+func WithRequestMethod(method string) Option {
+	return func(h *HTTP) {
+		h.requestMethod = strings.ToUpper(strings.TrimSpace(method))
+	}
+}
+
+// WithMethod is an alias for WithRequestMethod
+func WithMethod(method string) Option {
+	return WithRequestMethod(method)
 }
 
 // WithRequestHeader configures request header
@@ -243,6 +256,9 @@ func (h *HTTP) Check(ctx context.Context) (err error) {
 	method := http.MethodGet
 	if h.requestBody != nil {
 		method = http.MethodPost
+	}
+	if h.requestMethod != "" {
+		method = h.requestMethod
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, h.address, h.requestBody)
